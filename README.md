@@ -194,8 +194,4 @@ codeblooded404/
 
 ---
 
-## Links Checklist
 
-- [ ] Live link added at the top and opens in an Incognito window
-- [ ] Demo video link added (YouTube **Unlisted or Public**, never Private)
-- [ ] Team name and all member names filled in
