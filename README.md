@@ -10,7 +10,7 @@
 |---|---|
 | **Live Deployed Application** | [https://codeblooded404.vercel.app/]|
 | **Demo Video (YouTube, Unlisted/Public)** | [https://youtu.be/9p8144jiJW8?si=y7gLP0RzOzoOEqfe] |
-| **GitHub Repository** | https://github.com/krishd06/codeblooded404 |
+| **GitHub Repository** | https://github.com/krishd06/codeblooded |
 
 ---
 
