@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../supabaseClient';
 import {
   Settings,
@@ -15,9 +16,10 @@ import {
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { theme, setTheme, isDark } = useTheme();
 
   // Settings State
-  const [themeChoice, setThemeChoice] = useState('dark');
+  const [themeChoice, setThemeChoice] = useState(theme || 'dark');
   const [timeoutMs, setTimeoutMs] = useState(10000);
   const [defaultHeaders, setDefaultHeaders] = useState('{\n  "Accept": "application/json"\n}');
   const [fullName, setFullName] = useState('');
@@ -131,61 +133,61 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Top Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Sentinel Preferences & Profile
+      <div className={`pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+        <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
+          Sentinel Preferences &amp; Profile
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className={`text-xs mt-1 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/80'}`}>
           Customize request runner defaults, timeout thresholds, and inspect security identity.
         </p>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/80 text-rose-300 text-sm flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-sm flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-rose-400" />
           <span>{error}</span>
         </div>
       )}
 
       {saveSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/80 text-emerald-300 text-sm flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-2">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>Preferences updated and persisted to Supabase!</span>
         </div>
       )}
 
       {loading ? (
-        <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-          <span className="text-sm">Retrieving preferences...</span>
+        <div className="p-12 text-center text-purple-200/70 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+          <span className="text-xs font-semibold">Retrieving preferences from Supabase...</span>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Identity & Profile Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-              <div className="p-2 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
+          <div className="purple-card p-6 rounded-2xl space-y-4">
+            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+              <div className={`p-2 rounded-xl border ${isDark ? 'bg-purple-600/20 text-purple-400 border-purple-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
                 <User className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Security Identity</h3>
-                <p className="text-xs text-slate-400">Authenticated Supabase user profile</p>
+                <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>Security Identity</h3>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Authenticated Supabase user profile</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-slate-400">Email Address:</span>
-                <p className="font-mono text-slate-200 mt-0.5">{user?.email}</p>
+                <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Email Address:</span>
+                <p className={`font-mono mt-0.5 font-medium ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>{user?.email}</p>
               </div>
               <div>
-                <span className="text-slate-400">User UUID (auth.uid):</span>
-                <p className="font-mono text-slate-400 truncate mt-0.5">{user?.id}</p>
+                <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>User UUID (auth.uid):</span>
+                <p className={`font-mono truncate mt-0.5 ${isDark ? 'text-purple-300/70' : 'text-emerald-700/90'}`}>{user?.id}</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
                 Display / Full Name
               </label>
               <input
@@ -193,7 +195,11 @@ export default function SettingsPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your Name"
-                className="w-full sm:max-w-md px-3.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all duration-300"
+                className={`w-full sm:max-w-md px-3.5 py-2 rounded-xl text-xs outline-none transition-all duration-200 ${
+                  isDark
+                    ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                    : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
+                }`}
               />
             </div>
           </div>
@@ -201,43 +207,50 @@ export default function SettingsPage() {
           {/* Test Runner Settings Form */}
           <form
             onSubmit={handleSaveSettings}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6"
+            className="purple-card p-6 rounded-2xl space-y-6"
           >
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-              <div className="p-2 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
+            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+              <div className={`p-2 rounded-xl border ${isDark ? 'bg-purple-600/20 text-purple-400 border-purple-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
                 <Settings className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Execution Parameters</h3>
-                <p className="text-xs text-slate-400">Defaults loaded on every test session</p>
+                <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>Execution Parameters</h3>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Defaults loaded on every test session</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Theme Choice */}
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Palette className="w-4 h-4 text-indigo-400" />
+                <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
+                  <Palette className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
                   <span>Theme Choice</span>
                 </label>
                 <select
                   value={themeChoice}
-                  onChange={(e) => setThemeChoice(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 font-semibold outline-none focus:border-indigo-500 transition-all duration-300"
+                  onChange={(e) => {
+                    const chosen = e.target.value;
+                    setThemeChoice(chosen);
+                    setTheme(chosen);
+                  }}
+                  className={`w-full px-3.5 py-2 rounded-xl text-xs font-semibold outline-none transition-all duration-200 ${
+                    isDark
+                      ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
+                  }`}
                 >
-                  <option value="dark">Sentinel Dark (bg-slate-950)</option>
-                  <option value="midnight">Midnight Black</option>
-                  <option value="high-contrast">High Contrast Dark</option>
+                  <option value="dark">Dark Theme (Kong Cosmic Purple &amp; Pitch Black)</option>
+                  <option value="light">Light Theme (Mint Green + Emerald + Deep Forest Green on Soft Off-White)</option>
                 </select>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Default theme token preference stored in user_preferences table.
+                <p className={`text-[11px] mt-1 ${isDark ? 'text-slate-500' : 'text-emerald-800/70'}`}>
+                  Instant live preview and synced to user preferences.
                 </p>
               </div>
 
               {/* Request Timeout */}
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-indigo-400" />
+                <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
+                  <Clock className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
                   <span>Default Timeout (ms)</span>
                 </label>
                 <input
@@ -247,9 +260,13 @@ export default function SettingsPage() {
                   step={500}
                   value={timeoutMs}
                   onChange={(e) => setTimeoutMs(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono text-slate-200 outline-none focus:border-indigo-500 transition-all duration-300"
+                  className={`w-full px-3.5 py-2 rounded-xl font-mono text-xs outline-none transition-all duration-200 ${
+                    isDark
+                      ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
+                  }`}
                 />
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className={`text-[11px] mt-1 ${isDark ? 'text-slate-500' : 'text-emerald-800/70'}`}>
                   Maximum execution window before aborting test calls (default 10000 ms).
                 </p>
               </div>
@@ -257,18 +274,22 @@ export default function SettingsPage() {
 
             {/* Default Headers */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Terminal className="w-4 h-4 text-indigo-400" />
+              <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
+                <Terminal className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
                 <span>Default Request Headers (JSON)</span>
               </label>
               <textarea
                 rows={4}
                 value={defaultHeaders}
                 onChange={(e) => setDefaultHeaders(e.target.value)}
-                className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all duration-300"
+                className={`w-full p-3 rounded-xl font-mono text-xs outline-none transition-all duration-200 ${
+                  isDark
+                    ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                    : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
+                }`}
                 placeholder='{ "Accept": "application/json" }'
               />
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className={`text-[11px] mt-1 ${isDark ? 'text-slate-500' : 'text-emerald-800/70'}`}>
                 JSON object of baseline headers appended to new tests.
               </p>
             </div>
@@ -277,7 +298,11 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/20 transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all duration-200 active:scale-[0.98] disabled:opacity-50 text-white ${
+                  isDark
+                    ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                    : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
+                }`}
               >
                 {saving ? (
                   <>

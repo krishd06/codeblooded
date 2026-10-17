@@ -24,7 +24,26 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    const pageName =
+      location.pathname.includes('collections')
+        ? 'Collections'
+        : location.pathname.includes('history')
+        ? 'History'
+        : location.pathname.includes('settings')
+        ? 'Settings'
+        : 'Protected Workspace';
+
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{
+          accessRestricted: true,
+          pageName,
+          from: location,
+        }}
+      />
+    );
   }
 
   return children ? children : <Outlet />;

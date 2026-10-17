@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../supabaseClient';
 import {
   Clock,
@@ -15,6 +16,7 @@ import {
 
 export default function HistoryPage() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const [history, setHistory] = useState([]);
@@ -84,16 +86,16 @@ export default function HistoryPage() {
   const getMethodBadge = (m) => {
     switch (m) {
       case 'GET':
-        return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+        return 'text-emerald-400 border-emerald-800/80 bg-emerald-950/60';
       case 'POST':
-        return 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10';
+        return 'text-purple-400 border-purple-800/80 bg-purple-950/60';
       case 'PUT':
       case 'PATCH':
-        return 'text-amber-400 border-amber-500/30 bg-amber-500/10';
+        return 'text-amber-400 border-amber-800/80 bg-amber-950/60';
       case 'DELETE':
-        return 'text-rose-400 border-rose-500/30 bg-rose-500/10';
+        return 'text-rose-400 border-rose-800/80 bg-rose-950/60';
       default:
-        return 'text-slate-400 border-slate-700 bg-slate-800';
+        return 'text-slate-300 border-slate-700 bg-slate-900';
     }
   };
 
@@ -112,13 +114,13 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Request History & Logs
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
+            Request History &amp; Logs
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Audit logs of previous API execution benchmarks and contract results.
+          <p className={`text-xs mt-1 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/80'}`}>
+            Audit logs of previous API execution benchmarks and contract results stored in Supabase.
           </p>
         </div>
 
@@ -126,18 +128,26 @@ export default function HistoryPage() {
           <button
             onClick={handleRefresh}
             disabled={refreshing || loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-medium transition-all duration-300"
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all duration-200 ${
+              isDark
+                ? 'bg-[#141033] hover:bg-[#1a1542] text-slate-200 border border-purple-500/30'
+                : 'bg-emerald-50 hover:bg-emerald-100 text-[#064e3b] border border-emerald-300'
+            }`}
           >
-            <RotateCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <RotateCw className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-600'} ${refreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
 
           {history.length > 0 && (
             <button
               onClick={handleClearHistory}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 border border-rose-800/60 text-xs font-medium transition-all duration-300"
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                isDark
+                  ? 'bg-rose-950/30 hover:bg-rose-950/60 text-rose-300 border border-rose-800/40'
+                  : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
+              }`}
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5 text-rose-500" />
               <span>Clear History</span>
             </button>
           )}
@@ -146,26 +156,26 @@ export default function HistoryPage() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400">Total Invocations</div>
-          <div className="text-2xl font-bold text-white mt-1">{totalRuns}</div>
+        <div className="purple-card p-4 rounded-2xl">
+          <div className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Total Invocations</div>
+          <div className={`text-2xl font-extrabold mt-1 ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>{totalRuns}</div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400">Average Latency</div>
-          <div className="text-2xl font-bold text-indigo-400 mt-1">{avgLatency} ms</div>
+        <div className="purple-card p-4 rounded-2xl">
+          <div className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Average Latency</div>
+          <div className={`text-2xl font-extrabold mt-1 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`}>{avgLatency} ms</div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400">Assertions Passed</div>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">{totalPassed}</div>
+        <div className="purple-card p-4 rounded-2xl">
+          <div className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Assertions Passed</div>
+          <div className="text-2xl font-extrabold text-emerald-600 mt-1">{totalPassed}</div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400">Assertions Failed</div>
-          <div className="text-2xl font-bold text-rose-400 mt-1">{totalFailed}</div>
+        <div className="purple-card p-4 rounded-2xl">
+          <div className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>Assertions Failed</div>
+          <div className="text-2xl font-extrabold text-rose-500 mt-1">{totalFailed}</div>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/80 text-rose-300 text-sm flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-sm flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-rose-400" />
           <span>{error}</span>
         </div>
@@ -173,100 +183,112 @@ export default function HistoryPage() {
 
       {/* History Table or Empty State */}
       {loading ? (
-        <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-          <span className="text-sm">Loading request history from Supabase...</span>
+        <div className={`p-12 text-center flex flex-col items-center justify-center gap-3 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/70'}`}>
+          <Loader2 className={`w-6 h-6 animate-spin ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+          <span className="text-xs font-semibold">Loading request history from Supabase...</span>
         </div>
       ) : history.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="purple-card p-12 text-center space-y-4">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto border ${
+            isDark
+              ? 'bg-[#141033] border-purple-500/30 text-purple-400'
+              : 'bg-emerald-100 border-emerald-300 text-emerald-800'
+          }`}>
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">No requests recorded yet</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
+            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>No requests recorded yet</h3>
+            <p className={`text-xs max-w-sm mx-auto mt-1 ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>
               Dispatch an API call in the tester sandbox to start recording performance history and assertion audits.
             </p>
           </div>
           <button
             onClick={() => navigate('/tester')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all duration-300"
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-md transition-all duration-200 text-white ${
+              isDark
+                ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
+            }`}
           >
             <Play className="w-3.5 h-3.5 fill-white" />
             <span>Launch Tester</span>
           </button>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div className="purple-card rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400">
-                  <th className="py-3 px-4 font-semibold">Method</th>
-                  <th className="py-3 px-4 font-semibold">Target URL</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold">Latency</th>
-                  <th className="py-3 px-4 font-semibold">Assertions</th>
-                  <th className="py-3 px-4 font-semibold">Timestamp</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                <tr className={`border-b ${isDark ? 'border-purple-500/20 bg-[#141033] text-slate-300' : 'border-emerald-200 bg-[#ecfdf5] text-[#064e3b]'}`}>
+                  <th className="py-3 px-4 font-bold">Method</th>
+                  <th className="py-3 px-4 font-bold">Target URL</th>
+                  <th className="py-3 px-4 font-bold">Status</th>
+                  <th className="py-3 px-4 font-bold">Latency</th>
+                  <th className="py-3 px-4 font-bold">Assertions</th>
+                  <th className="py-3 px-4 font-bold">Timestamp</th>
+                  <th className="py-3 px-4 font-bold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/70">
+              <tbody className={`divide-y ${isDark ? 'divide-purple-500/10' : 'divide-emerald-100'}`}>
                 {history.map((row) => (
                   <tr
                     key={row.id}
-                    className="hover:bg-slate-800/30 transition-all duration-300"
+                    className={`transition-all duration-200 ${isDark ? 'hover:bg-white/5' : 'hover:bg-emerald-50/60'}`}
                   >
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded font-mono font-bold text-[11px] border ${getMethodBadge(
+                        className={`inline-block px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${getMethodBadge(
                           row.method
                         )}`}
                       >
                         {row.method}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-300 truncate max-w-xs">
+                    <td className={`py-3 px-4 font-mono truncate max-w-xs font-medium ${isDark ? 'text-slate-200' : 'text-emerald-950'}`}>
                       {row.url}
                     </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                           row.status >= 200 && row.status < 400
-                            ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/80'
-                            : 'bg-rose-950/60 text-rose-400 border border-rose-800/80'
+                            ? 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80'
+                            : 'bg-rose-950/70 text-rose-400 border-rose-800/80'
                         }`}
                       >
                         {row.status || 'Err'}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-400 font-mono">
+                    <td className={`py-3 px-4 font-mono ${isDark ? 'text-slate-400' : 'text-emerald-800'}`}>
                       {row.response_time_ms} ms
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-emerald-400 font-semibold flex items-center gap-0.5">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="text-emerald-600 font-semibold flex items-center gap-0.5">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                           {row.passed || 0}
                         </span>
                         {row.failed > 0 && (
-                          <span className="text-rose-400 font-semibold flex items-center gap-0.5">
-                            <XCircle className="w-3 h-3" />
+                          <span className="text-rose-500 font-semibold flex items-center gap-0.5">
+                            <XCircle className="w-3 h-3 text-rose-500" />
                             {row.failed}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-slate-500 text-[11px]">
+                    <td className={`py-3 px-4 text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                       {new Date(row.created_at).toLocaleString()}
                     </td>
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => handleRetest(row)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-[11px] font-medium transition-all duration-300"
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all duration-200 ${
+                          isDark
+                            ? 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30'
+                            : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300'
+                        }`}
                         title="Re-run in Tester"
                       >
-                        <Play className="w-3 h-3 fill-indigo-300" />
+                        <Play className={`w-3 h-3 ${isDark ? 'fill-purple-300' : 'fill-emerald-800'}`} />
                         <span>Run</span>
                       </button>
                     </td>
