@@ -32,21 +32,79 @@ export default function CollectionsPage() {
   const [newExpKeys, setNewExpKeys] = useState('');
   const [creating, setCreating] = useState(false);
 
+  // LocalStorage keys for collections fallback
+  const LOCAL_COLLECTIONS_KEY = 'sentinel_saved_collections';
+
+  const getInitialFallbackCollections = () => [
+    {
+      id: 'col-1',
+      name: 'Fetch User Profile Endpoint',
+      method: 'GET',
+      url: 'https://jsonplaceholder.typicode.com/users/1',
+      headers: { 'Accept': 'application/json' },
+      expected_status: 200,
+      expected_keys: ['id', 'name', 'username', 'email'],
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+    },
+    {
+      id: 'col-2',
+      name: 'Create Post Benchmark',
+      method: 'POST',
+      url: 'https://jsonplaceholder.typicode.com/posts',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{\n  "title": "API Sentinel automated verification",\n  "body": "Checking status code & SLA latency",\n  "userId": 1\n}',
+      expected_status: 201,
+      expected_keys: ['id', 'title'],
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+    },
+    {
+      id: 'col-3',
+      name: 'HTTP 404 Validation Test',
+      method: 'GET',
+      url: 'https://jsonplaceholder.typicode.com/posts/999999',
+      headers: { 'Accept': 'application/json' },
+      expected_status: 404,
+      expected_keys: [],
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+    },
+  ];
+
   const fetchCollections = async () => {
-    if (!user) return;
     try {
       setError('');
-      const { data, error: fetchErr } = await supabase
-        .from('saved_requests')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      if (user && user.id && !user.id.startsWith('00000000-demo')) {
+        const { data, error: fetchErr } = await supabase
+          .from('saved_requests')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-      if (fetchErr) throw fetchErr;
-      setCollections(data || []);
+        if (!fetchErr && data) {
+          setCollections(data);
+          try {
+            localStorage.setItem(LOCAL_COLLECTIONS_KEY, JSON.stringify(data));
+          } catch (e) {}
+          return;
+        }
+      }
+
+      // Fallback to local storage (demo mode, network failure, or missing Supabase tables)
+      const stored = localStorage.getItem(LOCAL_COLLECTIONS_KEY);
+      if (stored) {
+        setCollections(JSON.parse(stored));
+      } else {
+        const initial = getInitialFallbackCollections();
+        setCollections(initial);
+        localStorage.setItem(LOCAL_COLLECTIONS_KEY, JSON.stringify(initial));
+      }
     } catch (err) {
-      console.error('Error fetching collections:', err);
-      setError(err.message || 'Failed to load collections.');
+      console.warn('Error fetching collections, using offline cache:', err);
+      try {
+        const stored = localStorage.getItem(LOCAL_COLLECTIONS_KEY);
+        setCollections(stored ? JSON.parse(stored) : getInitialFallbackCollections());
+      } catch (e) {
+        setCollections(getInitialFallbackCollections());
+      }
     } finally {
       setLoading(false);
     }
@@ -67,21 +125,49 @@ export default function CollectionsPage() {
         .map((k) => k.trim())
         .filter(Boolean);
 
-      const { data, error: insertErr } = await supabase
-        .from('saved_requests')
-        .insert({
-          user_id: user.id,
-          name: newName || `${newMethod} ${newUrl}`,
-          method: newMethod,
-          url: newUrl,
-          headers: { 'Content-Type': 'application/json' },
-          expected_status: parseInt(newExpStatus, 10) || 200,
-          expected_keys: expKeys,
-        })
-        .select();
+      const newRecord = {
+        id: 'local-' + Date.now(),
+        user_id: user?.id || 'demo-user',
+        name: newName || `${newMethod} ${newUrl}`,
+        method: newMethod,
+        url: newUrl,
+        headers: { 'Content-Type': 'application/json' },
+        expected_status: parseInt(newExpStatus, 10) || 200,
+        expected_keys: expKeys,
+        created_at: new Date().toISOString(),
+      };
 
-      if (insertErr) throw insertErr;
-      if (data) setCollections([data[0], ...collections]);
+      if (user && user.id && !user.id.startsWith('00000000-demo')) {
+        try {
+          const { data, error: insertErr } = await supabase
+            .from('saved_requests')
+            .insert({
+              user_id: user.id,
+              name: newName || `${newMethod} ${newUrl}`,
+              method: newMethod,
+              url: newUrl,
+              headers: { 'Content-Type': 'application/json' },
+              expected_status: parseInt(newExpStatus, 10) || 200,
+              expected_keys: expKeys,
+            })
+            .select();
+
+          if (!insertErr && data?.[0]) {
+            newRecord.id = data[0].id;
+          }
+        } catch (dbErr) {
+          console.warn('Could not persist to Supabase, saving locally:', dbErr);
+        }
+      }
+
+      setCollections((prev) => {
+        const updated = [newRecord, ...prev];
+        try {
+          localStorage.setItem(LOCAL_COLLECTIONS_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+
       setShowCreateModal(false);
       setNewName('');
       setNewUrl('');
@@ -96,13 +182,24 @@ export default function CollectionsPage() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this saved request from your collection?')) return;
     try {
-      const { error: delErr } = await supabase
-        .from('saved_requests')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-      if (delErr) throw delErr;
-      setCollections(collections.filter((c) => c.id !== id));
+      if (user && user.id && !user.id.startsWith('00000000-demo')) {
+        try {
+          await supabase
+            .from('saved_requests')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user.id);
+        } catch (dbErr) {
+          console.warn('Could not delete in Supabase:', dbErr);
+        }
+      }
+      setCollections((prev) => {
+        const updated = prev.filter((c) => c.id !== id);
+        try {
+          localStorage.setItem(LOCAL_COLLECTIONS_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     } catch (err) {
       alert(`Failed to delete: ${err.message}`);
     }
@@ -121,7 +218,7 @@ export default function CollectionsPage() {
       case 'GET':
         return 'text-emerald-400 border-emerald-800/80 bg-emerald-950/60';
       case 'POST':
-        return 'text-purple-400 border-purple-800/80 bg-purple-950/60';
+        return 'text-blue-400 border-blue-800/80 bg-blue-950/60';
       case 'PUT':
       case 'PATCH':
         return 'text-amber-400 border-amber-800/80 bg-amber-950/60';
@@ -135,12 +232,12 @@ export default function CollectionsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
         <div>
           <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
             Saved Collections
           </h1>
-          <p className={`text-xs mt-1 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/80'}`}>
+          <p className={`text-xs mt-1 ${isDark ? 'text-blue-200/70' : 'text-emerald-800/80'}`}>
             Organize test endpoints and contract assertions into reusable suites backed by Supabase.
           </p>
         </div>
@@ -149,7 +246,7 @@ export default function CollectionsPage() {
           onClick={() => setShowCreateModal(true)}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all duration-200 text-white ${
             isDark
-              ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+              ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
               : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
           }`}
         >
@@ -167,15 +264,15 @@ export default function CollectionsPage() {
 
       {/* Collections Grid */}
       {loading ? (
-        <div className={`p-12 text-center flex flex-col items-center justify-center gap-3 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/70'}`}>
-          <Loader2 className={`w-6 h-6 animate-spin ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+        <div className={`p-12 text-center flex flex-col items-center justify-center gap-3 ${isDark ? 'text-blue-200/70' : 'text-emerald-800/70'}`}>
+          <Loader2 className={`w-6 h-6 animate-spin ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
           <span className="text-xs font-semibold">Loading collections from Supabase...</span>
         </div>
       ) : collections.length === 0 ? (
-        <div className="purple-card p-12 text-center space-y-4">
+        <div className="blue-card p-12 text-center space-y-4">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto border ${
             isDark
-              ? 'bg-[#141033] border-purple-500/30 text-purple-400'
+              ? 'bg-[#0f172a] border-blue-500/30 text-blue-400'
               : 'bg-emerald-100 border-emerald-300 text-emerald-800'
           }`}>
             <FolderGit2 className="w-6 h-6" />
@@ -190,7 +287,7 @@ export default function CollectionsPage() {
             onClick={() => setShowCreateModal(true)}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-md transition-all duration-200 text-white ${
               isDark
-                ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                 : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
             }`}
           >
@@ -203,7 +300,7 @@ export default function CollectionsPage() {
           {collections.map((item) => (
             <div
               key={item.id}
-              className="purple-card p-5 rounded-2xl space-y-3 group"
+              className="blue-card p-5 rounded-2xl space-y-3 group"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -224,7 +321,7 @@ export default function CollectionsPage() {
                     onClick={() => handleRunInTester(item)}
                     className={`p-1.5 rounded-lg transition-all duration-200 ${
                       isDark
-                        ? 'bg-purple-600/20 text-purple-300 hover:bg-purple-600 hover:text-white'
+                        ? 'bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white'
                         : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-600 hover:text-white'
                     }`}
                     title="Load in API Workspace"
@@ -247,7 +344,7 @@ export default function CollectionsPage() {
 
               <div className={`p-2.5 rounded-xl border font-mono text-xs truncate font-medium ${
                 isDark
-                  ? 'bg-[#08061a] border-purple-500/20 text-slate-200'
+                  ? 'bg-[#070d1e] border-blue-500/20 text-slate-200'
                   : 'bg-[#f4f8f6] border-emerald-200 text-emerald-950'
               }`}>
                 {item.url}
@@ -262,7 +359,7 @@ export default function CollectionsPage() {
                 )}
 
                 {item.expected_keys && item.expected_keys.length > 0 && (
-                  <span className={`flex items-center gap-1 font-semibold ${isDark ? 'text-purple-300' : 'text-emerald-700'}`}>
+                  <span className={`flex items-center gap-1 font-semibold ${isDark ? 'text-blue-300' : 'text-emerald-700'}`}>
                     <Tag className="w-3.5 h-3.5" />
                     <span>{item.expected_keys.length} key checks</span>
                   </span>
@@ -282,10 +379,10 @@ export default function CollectionsPage() {
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
           <div className={`border rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl transition-all duration-200 space-y-4 ${
             isDark
-              ? 'bg-[#0c0924] border-purple-500/30 text-white shadow-purple-950/80'
+              ? 'bg-[#0b1329] border-blue-500/30 text-white shadow-blue-950/80'
               : 'bg-white border-emerald-300 text-slate-900 shadow-emerald-950/20'
           }`}>
-            <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+            <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
               <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>Save New Request</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -308,7 +405,7 @@ export default function CollectionsPage() {
                   placeholder="e.g. Get User Profile"
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition-all duration-200 ${
                     isDark
-                      ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                       : 'bg-[#f4f8f6] border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                   }`}
                 />
@@ -324,7 +421,7 @@ export default function CollectionsPage() {
                     onChange={(e) => setNewMethod(e.target.value)}
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-bold outline-none transition-all duration-200 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400'
+                        ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400'
                         : 'bg-[#f4f8f6] border-emerald-300 text-emerald-950 focus:border-emerald-500'
                     }`}
                   >
@@ -348,7 +445,7 @@ export default function CollectionsPage() {
                     placeholder="https://api.example.com/data"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-mono outline-none transition-all duration-200 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                        ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                         : 'bg-[#f4f8f6] border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                     }`}
                   />
@@ -367,7 +464,7 @@ export default function CollectionsPage() {
                     placeholder="200"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-mono outline-none transition-all duration-200 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400'
+                        ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400'
                         : 'bg-[#f4f8f6] border-emerald-300 text-emerald-950 focus:border-emerald-500'
                     }`}
                   />
@@ -383,14 +480,14 @@ export default function CollectionsPage() {
                     placeholder="id, status"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-mono outline-none transition-all duration-200 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400'
+                        ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400'
                         : 'bg-[#f4f8f6] border-emerald-300 text-emerald-950 focus:border-emerald-500'
                     }`}
                   />
                 </div>
               </div>
 
-              <div className={`flex justify-end gap-2 pt-3 border-t ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+              <div className={`flex justify-end gap-2 pt-3 border-t ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
@@ -407,7 +504,7 @@ export default function CollectionsPage() {
                   disabled={creating}
                   className={`px-4 py-2 rounded-xl text-xs font-bold shadow-md transition-all duration-200 text-white ${
                     isDark
-                      ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                      ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                       : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
                   }`}
                 >

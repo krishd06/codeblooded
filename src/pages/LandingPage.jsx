@@ -680,7 +680,7 @@ export default function LandingPage() {
         {/* 6 Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -704,7 +704,7 @@ export default function LandingPage() {
           </div>
 
           {/* Card 2 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -728,7 +728,7 @@ export default function LandingPage() {
           </div>
 
           {/* Card 3 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -752,7 +752,7 @@ export default function LandingPage() {
           </div>
 
           {/* Card 4 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -776,7 +776,7 @@ export default function LandingPage() {
           </div>
 
           {/* Card 5 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -800,7 +800,7 @@ export default function LandingPage() {
           </div>
 
           {/* Card 6 */}
-          <div className="purple-card p-6 rounded-2xl space-y-3">
+          <div className="blue-card p-6 rounded-2xl space-y-3">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
@@ -859,7 +859,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {/* Step 1 */}
-            <div className="purple-card p-6 rounded-2xl space-y-3">
+            <div className="blue-card p-6 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
@@ -894,7 +894,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 2 */}
-            <div className="purple-card p-6 rounded-2xl space-y-3">
+            <div className="blue-card p-6 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
@@ -929,7 +929,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 3 */}
-            <div className="purple-card p-6 rounded-2xl space-y-3">
+            <div className="blue-card p-6 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
@@ -964,7 +964,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 4 */}
-            <div className="purple-card p-6 rounded-2xl space-y-3">
+            <div className="blue-card p-6 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
@@ -1024,7 +1024,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {/* Plan 1: Free */}
-          <div className="purple-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
+          <div className="blue-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <span
                 className={`text-[11px] font-bold uppercase tracking-wider ${
@@ -1104,7 +1104,7 @@ export default function LandingPage() {
           </div>
 
           {/* Plan 2: Starter */}
-          <div className="purple-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
+          <div className="blue-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <span
                 className={`text-[11px] font-bold uppercase tracking-wider ${
@@ -1192,7 +1192,7 @@ export default function LandingPage() {
 
           {/* Plan 3: Growth (Most Popular) */}
           <div
-            className={`purple-card p-6 rounded-2xl flex flex-col justify-between space-y-6 relative ${
+            className={`blue-card p-6 rounded-2xl flex flex-col justify-between space-y-6 relative ${
               isDark
                 ? 'border-blue-500 shadow-xl shadow-blue-900/30'
                 : 'border-emerald-500 shadow-xl shadow-emerald-900/15'
@@ -1298,7 +1298,7 @@ export default function LandingPage() {
           </div>
 
           {/* Plan 4: Scale */}
-          <div className="purple-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
+          <div className="blue-card p-6 rounded-2xl flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <span
                 className={`text-[11px] font-bold uppercase tracking-wider ${

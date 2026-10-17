@@ -159,7 +159,7 @@ function highlightJson(jsonStr, isDark = true) {
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
           cls = isDark
-            ? 'text-purple-300 font-bold font-mono'
+            ? 'text-blue-300 font-bold font-mono'
             : 'text-[#064e3b] font-bold font-mono'; // key
         } else {
           cls = isDark
@@ -1007,7 +1007,7 @@ export default function TesterPage() {
   // Save to collections handler
   const handleSaveToCollections = async () => {
     if (!user) {
-      alert('Please sign in to save this request to your Supabase collections.');
+      alert('Please sign in to save this request to your collections. You can also use our 1-Click Demo account.');
       return;
     }
 
@@ -1019,7 +1019,8 @@ export default function TesterPage() {
         .map((k) => k.trim())
         .filter(Boolean);
 
-      const { error } = await supabase.from('saved_requests').insert({
+      const newRecord = {
+        id: 'col-' + Date.now(),
         user_id: user.id,
         name: requestName || `${method} ${url}`,
         method,
@@ -1028,14 +1029,43 @@ export default function TesterPage() {
         body: ['POST', 'PUT', 'PATCH'].includes(method) ? bodyText : null,
         expected_status: parseInt(expectedStatus, 10) || 200,
         expected_keys: expKeysArr,
-      });
+        created_at: new Date().toISOString(),
+      };
 
-      if (error) throw error;
+      if (!user.id.startsWith('00000000-demo')) {
+        try {
+          const { data, error } = await supabase.from('saved_requests').insert({
+            user_id: user.id,
+            name: newRecord.name,
+            method,
+            url: newRecord.url,
+            headers: finalHeaders,
+            body: newRecord.body,
+            expected_status: newRecord.expected_status,
+            expected_keys: expKeysArr,
+          }).select();
+
+          if (!error && data?.[0]) {
+            newRecord.id = data[0].id;
+          }
+        } catch (dbErr) {
+          console.warn('Could not persist to Supabase, saving locally:', dbErr);
+        }
+      }
+
+      // Persist to local collections storage
+      try {
+        const stored = localStorage.getItem('sentinel_saved_collections');
+        const list = stored ? JSON.parse(stored) : [];
+        localStorage.setItem('sentinel_saved_collections', JSON.stringify([newRecord, ...list]));
+      } catch (e) {}
+
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (err) {
-      alert(`Failed to save: ${err.message}`);
-      setSaveStatus('');
+      console.warn('Error saving to collections:', err);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus(''), 3000);
     }
   };
 
@@ -1070,7 +1100,7 @@ export default function TesterPage() {
       case 'GET':
         return 'bg-emerald-950/60 text-emerald-400 border-emerald-800/80';
       case 'POST':
-        return 'bg-purple-950/60 text-purple-400 border-purple-800/80';
+        return 'bg-blue-950/60 text-blue-400 border-blue-800/80';
       case 'PUT':
         return 'bg-amber-950/60 text-amber-400 border-amber-800/80';
       case 'PATCH':
@@ -1131,7 +1161,7 @@ export default function TesterPage() {
   return (
     <div className="space-y-6">
       {/* Top Workspace Header Bar */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
         <div>
           <div className="flex items-center gap-2.5">
             <img
@@ -1146,13 +1176,13 @@ export default function TesterPage() {
             </h1>
             <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${
               isDark
-                ? 'bg-purple-950/70 text-purple-300 border-purple-700/50'
+                ? 'bg-blue-950/70 text-blue-300 border-blue-700/50'
                 : 'bg-emerald-100 text-emerald-800 border-emerald-300'
             }`}>
               Live Runner
             </span>
           </div>
-          <p className={`text-xs mt-1 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/80 font-medium'}`}>
+          <p className={`text-xs mt-1 ${isDark ? 'text-blue-200/70' : 'text-emerald-800/80 font-medium'}`}>
             Dispatch real HTTP requests, configure query params &amp; headers, benchmark latency, and execute automated validation checks.
           </p>
         </div>
@@ -1164,12 +1194,12 @@ export default function TesterPage() {
             onClick={() => setHistoryDrawerOpen(!historyDrawerOpen)}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all duration-200 ${
               isDark
-                ? 'bg-[#141033] hover:bg-[#1a1542] text-slate-200 border border-purple-500/30'
+                ? 'bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 border border-blue-500/30'
                 : 'bg-white hover:bg-emerald-50 text-[#064e3b] border border-emerald-200'
             }`}
             title="View recent execution history"
           >
-            <History className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+            <History className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
             <span>History ({localHistory.length})</span>
           </button>
 
@@ -1180,7 +1210,7 @@ export default function TesterPage() {
               disabled={saveStatus === 'saving'}
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-md transition-all duration-200 ${
                 isDark
-                  ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                  ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                   : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
               }`}
             >
@@ -1197,7 +1227,7 @@ export default function TesterPage() {
               )}
             </button>
           ) : (
-            <span className={`text-xs italic hidden md:inline ${isDark ? 'text-purple-300/60' : 'text-emerald-700/80 font-medium'}`}>
+            <span className={`text-xs italic hidden md:inline ${isDark ? 'text-blue-300/60' : 'text-emerald-700/80 font-medium'}`}>
               (Sign in to sync suites to Supabase)
             </span>
           )}
@@ -1208,12 +1238,12 @@ export default function TesterPage() {
       {historyDrawerOpen && (
         <div className={`border rounded-2xl p-4 shadow-xl transition-all duration-300 space-y-3 ${
           isDark
-            ? 'bg-[#0c0924] border-purple-500/30 shadow-purple-950/40'
+            ? 'bg-[#0b1329] border-blue-500/30 shadow-blue-950/40'
             : 'bg-white border-emerald-200 shadow-emerald-950/5'
         }`}>
-          <div className={`flex items-center justify-between pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+          <div className={`flex items-center justify-between pb-2 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
             <div className="flex items-center gap-2">
-              <History className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+              <History className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
               <h2 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
                 Recent Request History (Click to Reload)
               </h2>
@@ -1240,7 +1270,7 @@ export default function TesterPage() {
                   onClick={() => loadRequestData(item)}
                   className={`p-2.5 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between gap-1.5 group ${
                     isDark
-                      ? 'bg-[#141033]/60 hover:bg-[#1a1542] border-purple-500/20 hover:border-purple-400'
+                      ? 'bg-[#0f172a]/60 hover:bg-[#1e293b] border-blue-500/20 hover:border-blue-400'
                       : 'bg-emerald-50/50 hover:bg-emerald-100/60 border-emerald-200 hover:border-emerald-300'
                   }`}
                 >
@@ -1261,7 +1291,7 @@ export default function TesterPage() {
                     </span>
                   </div>
                   <div className={`text-xs font-mono truncate font-medium ${
-                    isDark ? 'text-slate-200 group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700 font-semibold'
+                    isDark ? 'text-slate-200 group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700 font-semibold'
                   }`}>
                     {item.url}
                   </div>
@@ -1294,13 +1324,13 @@ export default function TesterPage() {
         <div className="lg:col-span-6 space-y-4">
           <div className={`p-5 rounded-2xl shadow-xl space-y-4 transition-all duration-300 ${
             isDark
-              ? 'purple-card bg-[#0c0924] border border-purple-500/30'
+              ? 'blue-card bg-[#0b1329] border border-blue-500/30'
               : 'bg-white border border-emerald-200/80 shadow-emerald-950/5'
           }`}>
             {/* Quick Examples Selector */}
-            <div className={`flex items-center justify-between gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+            <div className={`flex items-center justify-between gap-3 pb-3 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
               <label className={`text-xs font-bold flex items-center gap-1.5 flex-shrink-0 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
-                <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                 <span>Quick Examples:</span>
               </label>
               <select
@@ -1308,7 +1338,7 @@ export default function TesterPage() {
                 defaultValue=""
                 className={`w-full max-w-xs px-3 py-1.5 rounded-xl border text-xs font-medium outline-none transition-all duration-200 cursor-pointer ${
                   isDark
-                    ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                    ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                     : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] focus:border-emerald-500 focus:bg-white'
                 }`}
               >
@@ -1336,7 +1366,7 @@ export default function TesterPage() {
                   placeholder="e.g. Fetch user profile endpoint"
                   className={`w-full px-3 py-2 rounded-xl border text-xs font-medium outline-none transition-all duration-200 ${
                     isDark
-                      ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                       : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                   }`}
                 />
@@ -1375,19 +1405,19 @@ export default function TesterPage() {
                     placeholder="https://api.example.com/endpoint"
                     className={`w-full h-11 px-3.5 rounded-xl border font-mono text-xs outline-none transition-all duration-200 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/30 text-white placeholder-slate-500 focus:border-purple-400 focus:bg-[#1a1542]'
+                        ? 'bg-[#0f172a] border-blue-500/30 text-white placeholder-slate-500 focus:border-blue-400 focus:bg-[#1e293b]'
                         : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                     }`}
                   />
                 </div>
 
-                {/* Send Button */}
+                {/* Send Single Request Button */}
                 <button
                   onClick={handleSendRequest}
-                  disabled={loading || Boolean(bodyJsonError) || !url.trim()}
-                  className={`h-11 px-6 rounded-xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 text-white ${
+                  disabled={loading || isLoadTesting || Boolean(bodyJsonError) || !url.trim()}
+                  className={`h-11 px-5 rounded-xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 text-white ${
                     isDark
-                      ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                      ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                       : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
                   }`}
                   title={bodyJsonError ? 'Cannot send: invalid JSON body' : 'Send HTTP Request'}
@@ -1404,13 +1434,40 @@ export default function TesterPage() {
                     </>
                   )}
                 </button>
+
+                {/* Load Test Trigger Button */}
+                <button
+                  type="button"
+                  onClick={isLoadTesting ? handleStopLoadTest : handleRunLoadTest}
+                  disabled={loading || Boolean(bodyJsonError) || !url.trim()}
+                  className={`h-11 px-4 rounded-xl font-bold text-xs shadow-lg flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 text-white ${
+                    isLoadTesting
+                      ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/30 animate-pulse'
+                      : isDark
+                      ? 'bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-600 hover:to-indigo-500 shadow-blue-600/30 border border-blue-400/30'
+                      : 'bg-gradient-to-r from-teal-700 to-emerald-600 hover:from-teal-600 hover:to-emerald-500 shadow-emerald-700/20 border border-emerald-400/30'
+                  }`}
+                  title="Run automated load benchmark across multiple requests per second"
+                >
+                  {isLoadTesting ? (
+                    <>
+                      <StopCircle className="w-4 h-4 text-white" />
+                      <span>Stop Test</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                      <span>Load Test</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 
             {/* Request Configuration Tabs */}
             <div className="pt-2">
               {/* Tab Navigation */}
-              <div className={`flex flex-wrap items-center justify-between border-b pb-2 gap-2 ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+              <div className={`flex flex-wrap items-center justify-between border-b pb-2 gap-2 ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
                 <div className="flex flex-wrap items-center gap-1.5">
                   {/* Params Tab */}
                   <button
@@ -1419,7 +1476,7 @@ export default function TesterPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       activeConfigTab === 'params'
                         ? isDark
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                           : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                         : isDark
                         ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1437,7 +1494,7 @@ export default function TesterPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       activeConfigTab === 'headers'
                         ? isDark
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                           : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                         : isDark
                         ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1455,7 +1512,7 @@ export default function TesterPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       activeConfigTab === 'body'
                         ? isDark
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                           : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                         : isDark
                         ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1476,7 +1533,7 @@ export default function TesterPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       activeConfigTab === 'auth'
                         ? isDark
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                           : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                         : isDark
                         ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1494,7 +1551,7 @@ export default function TesterPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       activeConfigTab === 'validation'
                         ? isDark
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                           : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                         : isDark
                         ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -1513,7 +1570,7 @@ export default function TesterPage() {
                     onClick={handleFormatJson}
                     className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-200 border ${
                       isDark
-                        ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/30'
+                        ? 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-500/30'
                         : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border-emerald-300'
                     }`}
                     title="Format JSON indentation"
@@ -1527,7 +1584,7 @@ export default function TesterPage() {
               {/* TAB 1: PARAMS (Query Parameters with 2-way URL sync) */}
               {activeConfigTab === 'params' && (
                 <div className="pt-3 space-y-2">
-                  <div className={`flex items-center justify-between text-[11px] px-1 font-semibold ${isDark ? 'text-purple-200/60' : 'text-emerald-800/80'}`}>
+                  <div className={`flex items-center justify-between text-[11px] px-1 font-semibold ${isDark ? 'text-blue-200/60' : 'text-emerald-800/80'}`}>
                     <span>Query parameters automatically synchronize with URL</span>
                     <span>{paramRows.filter((r) => r.key.trim() && r.enabled).length} Active</span>
                   </div>
@@ -1539,7 +1596,7 @@ export default function TesterPage() {
                         <button
                           type="button"
                           onClick={() => updateParamRow(row.id, 'enabled', !row.enabled)}
-                          className={`p-1 ${isDark ? 'text-purple-400 hover:text-purple-300' : 'text-emerald-600 hover:text-emerald-700'}`}
+                          className={`p-1 ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-emerald-600 hover:text-emerald-700'}`}
                           title={row.enabled ? 'Disable parameter' : 'Enable parameter'}
                         >
                           {row.enabled ? (
@@ -1556,7 +1613,7 @@ export default function TesterPage() {
                           placeholder="Parameter Key (e.g. limit)"
                           className={`flex-1 px-3 py-2 rounded-xl border font-mono text-xs outline-none transition-all duration-200 ${
                             isDark
-                              ? 'bg-[#141033] border-purple-500/30 text-white placeholder-slate-500 focus:border-purple-400 focus:bg-[#1a1542]'
+                              ? 'bg-[#0f172a] border-blue-500/30 text-white placeholder-slate-500 focus:border-blue-400 focus:bg-[#1e293b]'
                               : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                           } ${!row.enabled ? 'opacity-40 line-through' : ''}`}
                         />
@@ -1567,7 +1624,7 @@ export default function TesterPage() {
                           placeholder="Value (e.g. 10)"
                           className={`flex-1 px-3 py-2 rounded-xl border font-mono text-xs outline-none transition-all duration-200 ${
                             isDark
-                              ? 'bg-[#141033] border-purple-500/30 text-white placeholder-slate-500 focus:border-purple-400 focus:bg-[#1a1542]'
+                              ? 'bg-[#0f172a] border-blue-500/30 text-white placeholder-slate-500 focus:border-blue-400 focus:bg-[#1e293b]'
                               : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                           } ${!row.enabled ? 'opacity-40' : ''}`}
                         />
@@ -1592,7 +1649,7 @@ export default function TesterPage() {
                     onClick={addParamRow}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 mt-2 border ${
                       isDark
-                        ? 'bg-purple-950/40 hover:bg-purple-900/50 text-purple-300 border-purple-700/40'
+                        ? 'bg-blue-950/40 hover:bg-blue-900/50 text-blue-300 border-blue-700/40'
                         : 'bg-emerald-100 hover:bg-emerald-200 text-[#064e3b] border-emerald-300'
                     }`}
                   >
@@ -1611,7 +1668,7 @@ export default function TesterPage() {
                         <button
                           type="button"
                           onClick={() => updateHeaderRow(row.id, 'enabled', !row.enabled)}
-                          className={`p-1 ${isDark ? 'text-purple-400 hover:text-purple-300' : 'text-emerald-600 hover:text-emerald-700'}`}
+                          className={`p-1 ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-emerald-600 hover:text-emerald-700'}`}
                           title={row.enabled ? 'Disable header' : 'Enable header'}
                         >
                           {row.enabled ? (
@@ -1628,7 +1685,7 @@ export default function TesterPage() {
                           placeholder="Header (e.g. Content-Type)"
                           className={`flex-1 px-3 py-2 rounded-xl border font-mono text-xs outline-none transition-all duration-200 ${
                             isDark
-                              ? 'bg-[#141033] border-purple-500/30 text-white placeholder-slate-500 focus:border-purple-400 focus:bg-[#1a1542]'
+                              ? 'bg-[#0f172a] border-blue-500/30 text-white placeholder-slate-500 focus:border-blue-400 focus:bg-[#1e293b]'
                               : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                           } ${!row.enabled ? 'opacity-40 line-through' : ''}`}
                         />
@@ -1639,7 +1696,7 @@ export default function TesterPage() {
                           placeholder="Value (e.g. application/json)"
                           className={`flex-1 px-3 py-2 rounded-xl border font-mono text-xs outline-none transition-all duration-200 ${
                             isDark
-                              ? 'bg-[#141033] border-purple-500/30 text-white placeholder-slate-500 focus:border-purple-400 focus:bg-[#1a1542]'
+                              ? 'bg-[#0f172a] border-blue-500/30 text-white placeholder-slate-500 focus:border-blue-400 focus:bg-[#1e293b]'
                               : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] placeholder:text-emerald-800/40 focus:border-emerald-500 focus:bg-white'
                           } ${!row.enabled ? 'opacity-40' : ''}`}
                         />
@@ -1664,7 +1721,7 @@ export default function TesterPage() {
                     onClick={addHeaderRow}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 mt-2 border ${
                       isDark
-                        ? 'bg-purple-950/40 hover:bg-purple-900/50 text-purple-300 border-purple-700/40'
+                        ? 'bg-blue-950/40 hover:bg-blue-900/50 text-blue-300 border-blue-700/40'
                         : 'bg-emerald-100 hover:bg-emerald-200 text-[#064e3b] border-emerald-300'
                     }`}
                   >
@@ -1680,7 +1737,7 @@ export default function TesterPage() {
                   {!hasBody ? (
                     <div className={`p-4 rounded-xl border text-xs space-y-1 ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/20 text-slate-300'
+                        ? 'bg-[#0f172a] border-blue-500/20 text-slate-300'
                         : 'bg-emerald-50 border-emerald-200 text-emerald-900'
                     }`}>
                       <p className={`font-bold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
@@ -1702,7 +1759,7 @@ export default function TesterPage() {
                             bodyJsonError
                               ? 'border-rose-500 focus:ring-1 focus:ring-rose-500'
                               : isDark
-                              ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                              ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                               : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] focus:border-emerald-500 focus:bg-white'
                           }`}
                         />
@@ -1741,7 +1798,7 @@ export default function TesterPage() {
                       onChange={(e) => setAuthType(e.target.value)}
                       className={`px-3 py-1.5 rounded-xl border text-xs font-bold outline-none ${
                         isDark
-                          ? 'bg-[#141033] border-purple-500/30 text-white focus:border-purple-400'
+                          ? 'bg-[#0f172a] border-blue-500/30 text-white focus:border-blue-400'
                           : 'bg-[#f4f8f6] border-emerald-300 text-[#022c22] focus:border-emerald-500'
                       }`}
                     >
@@ -1755,7 +1812,7 @@ export default function TesterPage() {
                   {authType === 'none' && (
                     <p className={`text-xs p-3 rounded-xl border ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/20 text-slate-400'
+                        ? 'bg-[#0f172a] border-blue-500/20 text-slate-400'
                         : 'bg-emerald-50/70 border-emerald-200 text-emerald-800'
                     }`}>
                       This request does not include any authorization credentials.
@@ -1765,7 +1822,7 @@ export default function TesterPage() {
                   {authType === 'bearer' && (
                     <div className={`space-y-1.5 p-3 rounded-xl border ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/20'
+                        ? 'bg-[#0f172a] border-blue-500/20'
                         : 'bg-emerald-50/70 border-emerald-200'
                     }`}>
                       <label className={`block text-xs font-bold ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
@@ -1778,12 +1835,12 @@ export default function TesterPage() {
                         placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                         className={`w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none ${
                           isDark
-                            ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                            ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                             : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                         }`}
                       />
-                      <p className={`text-[11px] ${isDark ? 'text-purple-300/70' : 'text-emerald-700/80 font-medium'}`}>
-                        Injected as header: <code className={`font-mono ${isDark ? 'text-purple-400' : 'text-emerald-800 font-bold'}`}>Authorization: Bearer &lt;token&gt;</code>
+                      <p className={`text-[11px] ${isDark ? 'text-blue-300/70' : 'text-emerald-700/80 font-medium'}`}>
+                        Injected as header: <code className={`font-mono ${isDark ? 'text-blue-400' : 'text-emerald-800 font-bold'}`}>Authorization: Bearer &lt;token&gt;</code>
                       </p>
                     </div>
                   )}
@@ -1791,7 +1848,7 @@ export default function TesterPage() {
                   {authType === 'basic' && (
                     <div className={`space-y-2 p-3 rounded-xl border ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/20'
+                        ? 'bg-[#0f172a] border-blue-500/20'
                         : 'bg-emerald-50/70 border-emerald-200'
                     }`}>
                       <div className="grid grid-cols-2 gap-2">
@@ -1806,7 +1863,7 @@ export default function TesterPage() {
                             placeholder="admin"
                             className={`w-full px-3 py-2 rounded-xl border text-xs outline-none ${
                               isDark
-                                ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                                ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                                 : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                             }`}
                           />
@@ -1822,14 +1879,14 @@ export default function TesterPage() {
                             placeholder="••••••••"
                             className={`w-full px-3 py-2 rounded-xl border text-xs outline-none ${
                               isDark
-                                ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                                ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                                 : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                             }`}
                           />
                         </div>
                       </div>
-                      <p className={`text-[11px] ${isDark ? 'text-purple-300/70' : 'text-emerald-700/80 font-medium'}`}>
-                        Injected as header: <code className={`font-mono ${isDark ? 'text-purple-400' : 'text-emerald-800 font-bold'}`}>Authorization: Basic &lt;base64&gt;</code>
+                      <p className={`text-[11px] ${isDark ? 'text-blue-300/70' : 'text-emerald-700/80 font-medium'}`}>
+                        Injected as header: <code className={`font-mono ${isDark ? 'text-blue-400' : 'text-emerald-800 font-bold'}`}>Authorization: Basic &lt;base64&gt;</code>
                       </p>
                     </div>
                   )}
@@ -1837,7 +1894,7 @@ export default function TesterPage() {
                   {authType === 'apikey' && (
                     <div className={`space-y-2 p-3 rounded-xl border ${
                       isDark
-                        ? 'bg-[#141033] border-purple-500/20'
+                        ? 'bg-[#0f172a] border-blue-500/20'
                         : 'bg-emerald-50/70 border-emerald-200'
                     }`}>
                       <div className="grid grid-cols-2 gap-2">
@@ -1852,7 +1909,7 @@ export default function TesterPage() {
                             placeholder="x-api-key"
                             className={`w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none ${
                               isDark
-                                ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                                ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                                 : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                             }`}
                           />
@@ -1868,7 +1925,7 @@ export default function TesterPage() {
                             placeholder="live_sec_..."
                             className={`w-full px-3 py-2 rounded-xl border text-xs font-mono outline-none ${
                               isDark
-                                ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                                ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                                 : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                             }`}
                           />
@@ -1904,10 +1961,10 @@ export default function TesterPage() {
               {activeConfigTab === 'validation' && (
                 <div className="pt-3 space-y-4">
                   <div className={`p-3.5 rounded-xl border space-y-3 ${
-                    isDark ? 'bg-[#141033] border-purple-500/20' : 'bg-emerald-50/70 border-emerald-200'
+                    isDark ? 'bg-[#0f172a] border-blue-500/20' : 'bg-emerald-50/70 border-emerald-200'
                   }`}>
                     <div className="flex items-center gap-2">
-                      <ShieldCheck className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                      <ShieldCheck className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                       <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
                         Response Validation Contract
                       </h3>
@@ -1926,7 +1983,7 @@ export default function TesterPage() {
                           placeholder="200"
                           className={`w-full px-3 py-1.5 rounded-xl border text-xs font-mono font-bold outline-none ${
                             isDark
-                              ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                              ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                               : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                           }`}
                         />
@@ -1950,7 +2007,7 @@ export default function TesterPage() {
                     </div>
 
                     {/* Response Structure Assertion */}
-                    <div className={`space-y-1.5 pt-1 border-t ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+                    <div className={`space-y-1.5 pt-1 border-t ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
                       <label className={`block text-xs font-bold ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
                         Response Structure Check
                       </label>
@@ -1968,10 +2025,10 @@ export default function TesterPage() {
                             className={`py-1.5 px-2 rounded-xl text-xs font-bold border transition-all duration-200 ${
                               structureCheck === item.id
                                 ? isDark
-                                  ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-900/40'
+                                  ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-900/40'
                                   : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-800/20'
                                 : isDark
-                                ? 'bg-[#08061a] text-slate-300 border-purple-500/20 hover:bg-[#1a1542]'
+                                ? 'bg-[#070d1e] text-slate-300 border-blue-500/20 hover:bg-[#1e293b]'
                                 : 'bg-white text-[#064e3b] border-emerald-300 hover:bg-emerald-100'
                             }`}
                           >
@@ -1992,7 +2049,7 @@ export default function TesterPage() {
                             placeholder="id, title, status"
                             className={`w-full px-3 py-1.5 rounded-xl border text-xs font-mono outline-none ${
                               isDark
-                                ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                                ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                                 : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                             }`}
                           />
@@ -2003,16 +2060,16 @@ export default function TesterPage() {
 
                   {/* Response-Time Monitoring (Latency SLA) */}
                   <div className={`p-3.5 rounded-xl border space-y-2 ${
-                    isDark ? 'bg-[#141033] border-purple-500/20' : 'bg-emerald-50/70 border-emerald-200'
+                    isDark ? 'bg-[#0f172a] border-blue-500/20' : 'bg-emerald-50/70 border-emerald-200'
                   }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Timer className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                        <Timer className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                         <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
                           Response-Time Monitoring (Max SLA)
                         </h3>
                       </div>
-                      <span className={`text-xs font-mono font-bold ${isDark ? 'text-purple-400' : 'text-emerald-700'}`}>
+                      <span className={`text-xs font-mono font-bold ${isDark ? 'text-blue-400' : 'text-emerald-700'}`}>
                         {maxAcceptableLatency} ms
                       </span>
                     </div>
@@ -2030,7 +2087,7 @@ export default function TesterPage() {
                         onChange={(e) => setMaxAcceptableLatency(Number(e.target.value))}
                         className={`w-28 px-3 py-1.5 rounded-xl border text-xs font-mono font-bold outline-none ${
                           isDark
-                            ? 'bg-[#08061a] border-purple-500/30 text-white focus:border-purple-400'
+                            ? 'bg-[#070d1e] border-blue-500/30 text-white focus:border-blue-400'
                             : 'bg-white border-emerald-300 text-[#022c22] focus:border-emerald-500'
                         }`}
                       />
@@ -2043,10 +2100,10 @@ export default function TesterPage() {
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
                               maxAcceptableLatency === ms
                                 ? isDark
-                                  ? 'bg-purple-600 text-white border-purple-500'
+                                  ? 'bg-blue-600 text-white border-blue-500'
                                   : 'bg-emerald-600 text-white border-emerald-600'
                                 : isDark
-                                ? 'bg-[#08061a] text-slate-300 border-purple-500/20 hover:bg-[#1a1542]'
+                                ? 'bg-[#070d1e] text-slate-300 border-blue-500/20 hover:bg-[#1e293b]'
                                 : 'bg-white text-[#064e3b] border-emerald-200 hover:bg-emerald-100'
                             }`}
                           >
@@ -2068,11 +2125,11 @@ export default function TesterPage() {
         <div className="lg:col-span-6 space-y-4">
           <div className={`p-5 rounded-2xl shadow-xl min-h-[480px] flex flex-col transition-all duration-300 ${
             isDark
-              ? 'purple-card bg-[#0c0924] border border-purple-500/30'
+              ? 'blue-card bg-[#0b1329] border border-blue-500/30'
               : 'bg-white border border-emerald-200/80 shadow-emerald-950/5'
           }`}>
             {/* Header: Response Title & Status Badges */}
-            <div className={`flex flex-wrap items-center justify-between gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+            <div className={`flex flex-wrap items-center justify-between gap-3 pb-3 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-extrabold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
                   Response Viewer &amp; Inspector
@@ -2111,10 +2168,10 @@ export default function TesterPage() {
                   {/* Size Badge */}
                   <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border font-mono ${
                     isDark
-                      ? 'bg-[#141033] text-slate-200 border-purple-500/20'
+                      ? 'bg-[#0f172a] text-slate-200 border-blue-500/20'
                       : 'bg-emerald-100 text-emerald-800 border-emerald-300'
                   }`}>
-                    <Database className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-700'}`} />
+                    <Database className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`} />
                     <span>
                       {responseMeta.sizeBytes
                         ? (responseMeta.sizeBytes / 1024).toFixed(2)
@@ -2130,34 +2187,34 @@ export default function TesterPage() {
             {loading && (
               <div className="py-12 space-y-6 flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-3">
-                  <div className={`h-7 w-28 rounded-full animate-pulse ${isDark ? 'bg-purple-900/30' : 'bg-emerald-200'}`}></div>
-                  <div className={`h-7 w-20 rounded-full animate-pulse ${isDark ? 'bg-purple-900/30' : 'bg-emerald-200'}`}></div>
-                  <div className={`h-7 w-20 rounded-full animate-pulse ${isDark ? 'bg-purple-900/30' : 'bg-emerald-200'}`}></div>
+                  <div className={`h-7 w-28 rounded-full animate-pulse ${isDark ? 'bg-blue-900/30' : 'bg-emerald-200'}`}></div>
+                  <div className={`h-7 w-20 rounded-full animate-pulse ${isDark ? 'bg-blue-900/30' : 'bg-emerald-200'}`}></div>
+                  <div className={`h-7 w-20 rounded-full animate-pulse ${isDark ? 'bg-blue-900/30' : 'bg-emerald-200'}`}></div>
                 </div>
 
                 <div className={`p-4 rounded-xl border space-y-3 flex-1 ${
-                  isDark ? 'bg-[#08061a] border-purple-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  isDark ? 'bg-[#070d1e] border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
                 }`}>
                   <div className="flex items-center gap-2 mb-4">
-                    <Loader2 className={`w-4 h-4 animate-spin ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                    <Loader2 className={`w-4 h-4 animate-spin ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                     <span className={`text-xs font-semibold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
                       Executing request via Vercel proxy runner...
                     </span>
                   </div>
-                  <div className={`h-4 rounded w-11/12 animate-pulse ${isDark ? 'bg-purple-900/20' : 'bg-emerald-100'}`}></div>
-                  <div className={`h-4 rounded w-4/5 animate-pulse ${isDark ? 'bg-purple-900/20' : 'bg-emerald-100'}`}></div>
-                  <div className={`h-4 rounded w-2/3 animate-pulse ${isDark ? 'bg-purple-900/20' : 'bg-emerald-100'}`}></div>
-                  <div className={`h-4 rounded w-5/6 animate-pulse ${isDark ? 'bg-purple-900/20' : 'bg-emerald-100'}`}></div>
+                  <div className={`h-4 rounded w-11/12 animate-pulse ${isDark ? 'bg-blue-900/20' : 'bg-emerald-100'}`}></div>
+                  <div className={`h-4 rounded w-4/5 animate-pulse ${isDark ? 'bg-blue-900/20' : 'bg-emerald-100'}`}></div>
+                  <div className={`h-4 rounded w-2/3 animate-pulse ${isDark ? 'bg-blue-900/20' : 'bg-emerald-100'}`}></div>
+                  <div className={`h-4 rounded w-5/6 animate-pulse ${isDark ? 'bg-blue-900/20' : 'bg-emerald-100'}`}></div>
                 </div>
               </div>
             )}
 
-            {/* EMPTY STATE */}
-            {!loading && !responseMeta && (
+            {/* EMPTY STATE OR LOAD-TEST RESULTS PANEL */}
+            {!loading && !responseMeta && !loadTestState && !isLoadTesting && (
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
                 <div className={`w-16 h-16 rounded-2xl border flex items-center justify-center shadow-inner ${
                   isDark
-                    ? 'bg-[#141033] border-purple-500/30 text-purple-400'
+                    ? 'bg-[#0f172a] border-blue-500/30 text-blue-400'
                     : 'bg-emerald-100 border-emerald-300 text-emerald-800'
                 }`}>
                   <Activity className="w-8 h-8" />
@@ -2167,16 +2224,295 @@ export default function TesterPage() {
                     No Request Sent Yet
                   </h3>
                   <p className={`text-xs max-w-sm mx-auto leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600 font-medium'}`}>
-                    Configure your method, endpoint, headers, and body on the left panel, or pick a Quick Example above and click <span className={`font-bold ${isDark ? 'text-purple-400' : 'text-emerald-700'}`}>&ldquo;Send&rdquo;</span>.
+                    Click <span className={`font-bold ${isDark ? 'text-blue-400' : 'text-emerald-700'}`}>&ldquo;Send&rdquo;</span> for a single request, or <span className={`font-bold ${isDark ? 'text-amber-400' : 'text-emerald-700'}`}>&ldquo;Load Test&rdquo;</span> to benchmark throughput and latency.
                   </p>
                 </div>
-                <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-semibold ${
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleRunLoadTest}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all shadow-sm ${
+                      isDark
+                        ? 'bg-blue-950/60 border-blue-500/40 text-blue-300 hover:bg-blue-900/40'
+                        : 'bg-emerald-100 border-emerald-300 text-emerald-900 hover:bg-emerald-200'
+                    }`}
+                  >
+                    <Zap className="w-3.5 h-3.5 fill-current text-amber-400" />
+                    <span>Run Quick Load Test (25 RPS)</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* LOAD-TEST RESULTS INTERFACE (MATCHING EXACT IMAGE 1) */}
+            {!loading && (loadTestState || isLoadTesting) && (
+              <div className="pt-2 flex-1 flex flex-col space-y-3.5">
+                {/* 1. Header: Window Dots + Free test + RPS/Duration Pill */}
+                <div className={`flex items-center justify-between pb-2.5 border-b ${isDark ? 'border-white/10' : 'border-emerald-200'}`}>
+                  <div className="flex items-center gap-2.5">
+                    {/* macOS 3 Dots */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                    </div>
+                    <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-[#064e3b]'}`}>
+                      Load-Test Results
+                    </span>
+                  </div>
+
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border font-mono ${
+                    isDark
+                      ? 'bg-blue-950/70 border-blue-500/40 text-blue-300'
+                      : 'bg-emerald-100 border-emerald-300 text-[#064e3b]'
+                  }`}>
+                    {loadTestState?.targetRps || loadTestConfig.targetRps} RPS · {loadTestState?.durationSec || loadTestConfig.durationSec}s
+                  </span>
+                </div>
+
+                {/* 2. Target URL Bar */}
+                <div className={`p-2.5 rounded-xl border flex items-center gap-2 font-mono text-xs overflow-hidden ${
                   isDark
-                    ? 'bg-purple-950/70 border-purple-700/50 text-purple-300'
-                    : 'bg-emerald-100 border-emerald-300 text-emerald-800'
+                    ? 'bg-[#0a081e] border-blue-500/20 text-slate-200'
+                    : 'bg-emerald-50/70 border-emerald-200 text-[#022c22]'
                 }`}>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>Direct Serverless Proxy Ready at /api/proxy</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                    method === 'GET'
+                      ? 'bg-emerald-600 text-white'
+                      : method === 'POST'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-amber-600 text-white'
+                  }`}>
+                    {method}
+                  </span>
+                  <span className="truncate flex-1">{url}</span>
+                </div>
+
+                {/* 3. Status Bar + Progress + Run Again / Stop Button */}
+                <div className={`p-3 rounded-xl border space-y-2 ${
+                  isDark ? 'bg-[#0f172a]/60 border-blue-500/20' : 'bg-white border-emerald-200'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-extrabold ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
+                        {(loadTestState?.totalSent || 0).toLocaleString()} sent
+                      </span>
+                      <span className="text-xs text-slate-400">·</span>
+                      <span className={`text-xs font-semibold ${
+                        (loadTestState?.failed || 0) > 0 ? 'text-rose-500' : 'text-slate-400'
+                      }`}>
+                        {(loadTestState?.failed || 0).toLocaleString()} failed
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                        isLoadTesting
+                          ? 'bg-amber-950/70 text-amber-400 border-amber-600/60 animate-pulse'
+                          : loadTestState?.status === 'Completed'
+                          ? 'bg-emerald-950/70 text-emerald-300 border-emerald-600/60'
+                          : 'bg-slate-800 text-slate-300 border-slate-700'
+                      }`}>
+                        {isLoadTesting ? 'Running...' : loadTestState?.status || 'Completed'}
+                      </span>
+
+                      {isLoadTesting ? (
+                        <button
+                          type="button"
+                          onClick={handleStopLoadTest}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-1 shadow-sm"
+                        >
+                          <StopCircle className="w-3.5 h-3.5" />
+                          <span>Stop</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleRunLoadTest}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1 shadow-sm transition-all ${
+                            isDark
+                              ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20'
+                              : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
+                          }`}
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Run again</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Visual Progress Bar */}
+                  <div className="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-300 ${
+                        isLoadTesting ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${loadTestState?.progress || 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* 4. 6 Metrics Grid (Total time, RPS, Requests, Success, Avg latency, p50) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total time</div>
+                    <div className={`text-lg font-black mt-0.5 ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
+                      {loadTestState?.elapsedSec || 0}s
+                    </div>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">RPS</div>
+                    <div className={`text-lg font-black mt-0.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`}>
+                      {loadTestState?.targetRps || loadTestConfig.targetRps}
+                    </div>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Requests</div>
+                    <div className={`text-lg font-black mt-0.5 ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
+                      {(loadTestState?.totalSent || 0).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Success</div>
+                    <div className="text-lg font-black mt-0.5 text-emerald-500">
+                      {loadTestState?.successRate || 100}%
+                    </div>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Avg latency</div>
+                    <div className={`text-lg font-black mt-0.5 ${isDark ? 'text-amber-400' : 'text-emerald-800'}`}>
+                      {loadTestState?.avgLatency || 0} ms
+                    </div>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border ${
+                    isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-emerald-50/50 border-emerald-200'
+                  }`}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">p50</div>
+                    <div className={`text-lg font-black mt-0.5 ${isDark ? 'text-amber-300' : 'text-emerald-800'}`}>
+                      {loadTestState?.p50Latency || 0} ms
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Additional latency breakdown row */}
+                <div className={`p-2 rounded-xl border text-[11px] flex flex-wrap items-center justify-between gap-2 font-mono ${
+                  isDark ? 'bg-black/30 border-white/10 text-slate-300' : 'bg-emerald-50 border-emerald-200 text-[#064e3b]'
+                }`}>
+                  <span>Min: <strong>{loadTestState?.minLatency || 0}ms</strong></span>
+                  <span>Max: <strong>{loadTestState?.maxLatency || 0}ms</strong></span>
+                  <span>HTTP 200: <strong>{(loadTestState?.successCount || 0).toLocaleString()}</strong></span>
+                  <span>Failed: <strong className={(loadTestState?.failed || 0) > 0 ? 'text-rose-500' : ''}>{(loadTestState?.failed || 0).toLocaleString()}</strong></span>
+                </div>
+
+                {/* 6. Requests each second graph */}
+                <div className={`p-3.5 rounded-xl border space-y-2 ${
+                  isDark ? 'bg-[#0f172a]/60 border-blue-500/20' : 'bg-white border-emerald-200'
+                }`}>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`font-extrabold ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
+                      Requests each second
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-400">
+                      target {loadTestState?.targetRps || loadTestConfig.targetRps} RPS
+                    </span>
+                  </div>
+
+                  {/* SVG Line Graph */}
+                  <div className="h-28 w-full relative pt-2">
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 400 90" preserveAspectRatio="none">
+                      {/* Grid Lines */}
+                      <line x1="0" y1="20" x2="400" y2="20" stroke={isDark ? '#334155' : '#e2e8f0'} strokeDasharray="3 3" strokeWidth="0.8" />
+                      <line x1="0" y1="50" x2="400" y2="50" stroke={isDark ? '#334155' : '#e2e8f0'} strokeDasharray="3 3" strokeWidth="0.8" />
+                      <line x1="0" y1="80" x2="400" y2="80" stroke={isDark ? '#334155' : '#e2e8f0'} strokeDasharray="3 3" strokeWidth="0.8" />
+
+                      {/* Target Reference Line */}
+                      <line x1="0" y1="35" x2="400" y2="35" stroke="#3b82f6" strokeWidth="1" strokeDasharray="4 2" opacity="0.6" />
+
+                      {/* RPS Curve / Sparkline */}
+                      {(() => {
+                        const history = loadTestState?.rpsHistory && loadTestState.rpsHistory.length > 0
+                          ? loadTestState.rpsHistory
+                          : [loadTestConfig.targetRps, loadTestConfig.targetRps];
+                        const maxVal = Math.max(...history, (loadTestState?.targetRps || 25) * 1.3, 10);
+                        const points = history.map((val, idx) => {
+                          const x = history.length === 1 ? 200 : (idx / (history.length - 1)) * 390 + 5;
+                          const y = 80 - (val / maxVal) * 65;
+                          return `${x},${y}`;
+                        }).join(' ');
+
+                        return (
+                          <>
+                            <polyline
+                              fill="none"
+                              stroke="#10b981"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              points={points}
+                            />
+                            {history.map((val, idx) => {
+                              const x = history.length === 1 ? 200 : (idx / (history.length - 1)) * 390 + 5;
+                              const y = 80 - (val / maxVal) * 65;
+                              return (
+                                <circle
+                                  key={idx}
+                                  cx={x}
+                                  cy={y}
+                                  r="3"
+                                  className="fill-emerald-400 stroke-white stroke-1"
+                                />
+                              );
+                            })}
+                          </>
+                        );
+                      })()}
+                    </svg>
+                  </div>
+                </div>
+
+                {/* 7. Action Buttons: Preview Report & Download PDF */}
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowReportModal(true)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                      isDark
+                        ? 'bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 border-blue-500/30'
+                        : 'bg-emerald-50 hover:bg-emerald-100 text-[#064e3b] border-emerald-300'
+                    }`}
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Preview report</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadPDF}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shadow-md transition-all ${
+                      isDark
+                        ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
+                        : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
+                    }`}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download PDF</span>
+                  </button>
                 </div>
               </div>
             )}
@@ -2185,7 +2521,7 @@ export default function TesterPage() {
             {!loading && responseMeta && (
               <div className="pt-3 flex-1 flex flex-col">
                 {/* Response Tabs: Body, Headers, Test Summary */}
-                <div className={`flex items-center justify-between border-b pb-2 ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+                <div className={`flex items-center justify-between border-b pb-2 ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
@@ -2193,7 +2529,7 @@ export default function TesterPage() {
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                         activeResTab === 'body'
                           ? isDark
-                            ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                             : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                           : isDark
                           ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -2209,7 +2545,7 @@ export default function TesterPage() {
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                         activeResTab === 'headers'
                           ? isDark
-                            ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                             : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                           : isDark
                           ? 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -2225,14 +2561,14 @@ export default function TesterPage() {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                         activeResTab === 'summary'
                           ? isDark
-                            ? 'bg-purple-600 text-white shadow-md shadow-purple-900/40'
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
                             : 'bg-emerald-600 text-white shadow-md shadow-emerald-800/20'
                           : isDark
                           ? 'text-slate-400 hover:text-white hover:bg-white/5'
                           : 'text-[#064e3b] hover:bg-emerald-100/60 font-semibold'
                       }`}
                     >
-                      <ShieldCheck className={`w-3.5 h-3.5 ${isDark ? 'text-purple-300' : 'text-emerald-700'}`} />
+                      <ShieldCheck className={`w-3.5 h-3.5 ${isDark ? 'text-blue-300' : 'text-emerald-700'}`} />
                       <span>Test Summary</span>
                       {responseMeta.validation && (
                         <span
@@ -2259,7 +2595,7 @@ export default function TesterPage() {
                       onClick={copyResponse}
                       className={`inline-flex items-center gap-1 text-xs py-1 px-2.5 rounded-lg border transition-all duration-200 font-semibold ${
                         isDark
-                          ? 'bg-[#141033] hover:bg-[#1a1542] text-slate-300 hover:text-white border-purple-500/20'
+                          ? 'bg-[#0f172a] hover:bg-[#1e293b] text-slate-300 hover:text-white border-blue-500/20'
                           : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border-emerald-300'
                       }`}
                     >
@@ -2286,14 +2622,14 @@ export default function TesterPage() {
                         dangerouslySetInnerHTML={{ __html: formattedResponseBody }}
                         className={`p-4 rounded-xl border font-mono text-xs overflow-x-auto max-h-[480px] leading-relaxed flex-1 select-text ${
                           isDark
-                            ? 'bg-[#08061a] border-purple-500/20 text-slate-200'
+                            ? 'bg-[#070d1e] border-blue-500/20 text-slate-200'
                             : 'bg-[#f8faf9] border-emerald-200 text-[#022c22]'
                         }`}
                       />
                     ) : (
                       <pre className={`p-4 rounded-xl border font-mono text-xs overflow-x-auto max-h-[480px] leading-relaxed flex-1 select-text whitespace-pre-wrap ${
                         isDark
-                          ? 'bg-[#08061a] border-purple-500/20 text-slate-200'
+                          ? 'bg-[#070d1e] border-blue-500/20 text-slate-200'
                           : 'bg-[#f8faf9] border-emerald-200 text-[#022c22]'
                       }`}>
                         {responseMeta.body || '(empty response)'}
@@ -2312,24 +2648,24 @@ export default function TesterPage() {
                     ) : (
                       <div className={`rounded-xl border overflow-hidden max-h-[480px] overflow-y-auto ${
                         isDark
-                          ? 'border-purple-500/20 bg-[#08061a]'
+                          ? 'border-blue-500/20 bg-[#070d1e]'
                           : 'border-emerald-200 bg-white'
                       }`}>
                         <table className="w-full text-left border-collapse text-xs">
                           <thead>
                             <tr className={`border-b ${
                               isDark
-                                ? 'border-purple-500/20 bg-[#141033] text-slate-300'
+                                ? 'border-blue-500/20 bg-[#0f172a] text-slate-300'
                                 : 'border-emerald-200 bg-emerald-100/70 text-[#064e3b]'
                             }`}>
                               <th className="py-2.5 px-3.5 font-bold w-1/3">Header Key</th>
                               <th className="py-2.5 px-3.5 font-bold">Value</th>
                             </tr>
                           </thead>
-                          <tbody className={`divide-y font-mono ${isDark ? 'divide-purple-500/10' : 'divide-emerald-100'}`}>
+                          <tbody className={`divide-y font-mono ${isDark ? 'divide-blue-500/10' : 'divide-emerald-100'}`}>
                             {Object.entries(responseMeta.headers).map(([key, val]) => (
                               <tr key={key} className={isDark ? 'hover:bg-white/5' : 'hover:bg-emerald-50/60'}>
-                                <td className={`py-2 px-3.5 font-semibold break-all ${isDark ? 'text-purple-300' : 'text-emerald-800'}`}>
+                                <td className={`py-2 px-3.5 font-semibold break-all ${isDark ? 'text-blue-300' : 'text-emerald-800'}`}>
                                   {key}
                                 </td>
                                 <td className={`py-2 px-3.5 break-all ${isDark ? 'text-slate-300' : 'text-[#022c22]'}`}>
@@ -2406,7 +2742,7 @@ export default function TesterPage() {
                               className={`p-3 rounded-xl border flex items-start gap-3 transition-all duration-200 ${
                                 check.passed
                                   ? isDark
-                                    ? 'bg-[#141033] border-purple-500/20'
+                                    ? 'bg-[#0f172a] border-blue-500/20'
                                     : 'bg-emerald-50/60 border-emerald-200'
                                   : isDark
                                   ? 'bg-rose-950/30 border-rose-800/40'
@@ -2467,6 +2803,124 @@ export default function TesterPage() {
           </div>
         </div>
       </div>
+
+      {/* Preview Report Modal Dialog */}
+      {showReportModal && loadTestState && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div
+            className={`w-full max-w-2xl rounded-2xl shadow-2xl border p-6 space-y-5 max-h-[90vh] overflow-y-auto ${
+              isDark
+                ? 'bg-[#0b1329] border-blue-500/30 text-white'
+                : 'bg-white border-emerald-300 text-[#064e3b]'
+            }`}
+          >
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2">
+                <BarChart2 className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
+                <h3 className="font-extrabold text-base">Load-Test Benchmark Report</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className={`p-1.5 rounded-lg border transition-all ${
+                  isDark
+                    ? 'hover:bg-white/10 border-white/10 text-slate-300'
+                    : 'hover:bg-emerald-50 border-emerald-200 text-[#064e3b]'
+                }`}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Target and Timing Summary */}
+            <div className={`p-3 rounded-xl border space-y-1 font-mono text-xs ${
+              isDark ? 'bg-black/40 border-white/10' : 'bg-emerald-50 border-emerald-200'
+            }`}>
+              <div><strong>Method &amp; URL:</strong> [{loadTestState.method}] {loadTestState.url}</div>
+              <div><strong>Target Concurrency:</strong> {loadTestState.targetRps} RPS for {loadTestState.durationSec}s</div>
+              <div><strong>Completed At:</strong> {new Date(loadTestState.completedAt || Date.now()).toLocaleString()}</div>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className={`p-3 rounded-xl border text-center ${
+                isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-white border-emerald-200'
+              }`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Total Requests</div>
+                <div className="text-xl font-extrabold mt-1">{loadTestState.totalSent.toLocaleString()}</div>
+              </div>
+              <div className={`p-3 rounded-xl border text-center ${
+                isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-white border-emerald-200'
+              }`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Success Rate</div>
+                <div className="text-xl font-extrabold text-emerald-500 mt-1">{loadTestState.successRate}%</div>
+              </div>
+              <div className={`p-3 rounded-xl border text-center ${
+                isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-white border-emerald-200'
+              }`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Avg Latency</div>
+                <div className="text-xl font-extrabold text-amber-400 mt-1">{loadTestState.avgLatency} ms</div>
+              </div>
+              <div className={`p-3 rounded-xl border text-center ${
+                isDark ? 'bg-[#0f172a]/70 border-blue-500/20' : 'bg-white border-emerald-200'
+              }`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">p50 Latency</div>
+                <div className="text-xl font-extrabold text-amber-300 mt-1">{loadTestState.p50Latency} ms</div>
+              </div>
+            </div>
+
+            {/* HTTP Status Breakdown Table */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider mb-2">HTTP Status Breakdown</h4>
+              <div className={`rounded-xl border overflow-hidden ${
+                isDark ? 'border-white/10' : 'border-emerald-200'
+              }`}>
+                <table className="w-full text-xs text-left">
+                  <thead className={isDark ? 'bg-white/5 text-slate-300' : 'bg-emerald-50 text-[#064e3b]'}>
+                    <tr>
+                      <th className="p-2.5 font-bold">Status Code</th>
+                      <th className="p-2.5 font-bold">Count</th>
+                      <th className="p-2.5 font-bold">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {Object.entries(loadTestState.statusCounts || {}).map(([st, cnt]) => (
+                      <tr key={st} className={isDark ? 'hover:bg-white/5' : 'hover:bg-emerald-50/50'}>
+                        <td className="p-2.5 font-mono font-bold">HTTP {st === '0' ? 'Network Error' : st}</td>
+                        <td className="p-2.5">{cnt} requests</td>
+                        <td className="p-2.5">{loadTestState.totalSent > 0 ? ((cnt / loadTestState.totalSent) * 100).toFixed(1) : 0}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t">
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold ${
+                  isDark ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                }`}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md ${
+                  isDark ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500'
+                }`}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download PDF Report</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

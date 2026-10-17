@@ -66,6 +66,54 @@ button {
   background: #2563eb;
 }
 
+/* ========================================================================= */
+/* GLOBAL REPLACEMENT OF PURPLE UTILITIES WITH SAPPHIRE BLUE IN DARK MODE */
+/* ========================================================================= */
+html:not([data-theme="light"]) .bg-purple-600 {
+  background-color: #2563eb !important;
+}
+html:not([data-theme="light"]) .hover\:bg-purple-500:hover,
+html:not([data-theme="light"]) .bg-purple-600:hover {
+  background-color: #3b82f6 !important;
+}
+html:not([data-theme="light"]) .bg-purple-950,
+html:not([data-theme="light"]) .bg-purple-950\/70,
+html:not([data-theme="light"]) .bg-purple-950\/60,
+html:not([data-theme="light"]) .bg-purple-950\/40 {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+html:not([data-theme="light"]) .text-purple-300,
+html:not([data-theme="light"]) .text-purple-400 {
+  color: #60a5fa !important;
+}
+html:not([data-theme="light"]) .text-purple-200,
+html:not([data-theme="light"]) .text-purple-200\/70,
+html:not([data-theme="light"]) .text-purple-200\/60 {
+  color: #93c5fd !important;
+}
+html:not([data-theme="light"]) .border-purple-500\/20,
+html:not([data-theme="light"]) .border-purple-500\/30,
+html:not([data-theme="light"]) .border-purple-500\/40,
+html:not([data-theme="light"]) .border-purple-700\/40,
+html:not([data-theme="light"]) .border-purple-700\/50,
+html:not([data-theme="light"]) .border-purple-800\/80 {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+html:not([data-theme="light"]) .shadow-purple-600\/30,
+html:not([data-theme="light"]) .shadow-purple-900\/40,
+html:not([data-theme="light"]) .shadow-purple-950\/40 {
+  box-shadow: 0 4px 18px 0 rgba(37, 99, 235, 0.25) !important;
+}
+html:not([data-theme="light"]) .bg-\[\#0c0924\],
+html:not([data-theme="light"]) .bg-\[\#141033\],
+html:not([data-theme="light"]) .bg-\[\#08061a\],
+html:not([data-theme="light"]) .bg-\[\#1a1542\] {
+  background-color: #0b1329 !important;
+}
+html:not([data-theme="light"]) .hover\:bg-\[\#1a1542\]:hover {
+  background-color: #121e3f !important;
+}
+
 /* Light Theme (Mint Green + Emerald + Deep Forest Green on Soft Off-White Background) */
 html[data-theme="light"],
 body.light {

@@ -133,11 +133,11 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Top Header */}
-      <div className={`pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
+      <div className={`pb-2 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
         <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#064e3b]'}`}>
           Sentinel Preferences &amp; Profile
         </h1>
-        <p className={`text-xs mt-1 ${isDark ? 'text-purple-200/70' : 'text-emerald-800/80'}`}>
+        <p className={`text-xs mt-1 ${isDark ? 'text-blue-200/70' : 'text-emerald-800/80'}`}>
           Customize request runner defaults, timeout thresholds, and inspect security identity.
         </p>
       </div>
@@ -157,16 +157,16 @@ export default function SettingsPage() {
       )}
 
       {loading ? (
-        <div className="p-12 text-center text-purple-200/70 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+        <div className="p-12 text-center text-blue-200/70 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
           <span className="text-xs font-semibold">Retrieving preferences from Supabase...</span>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Identity & Profile Card */}
-          <div className="purple-card p-6 rounded-2xl space-y-4">
-            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
-              <div className={`p-2 rounded-xl border ${isDark ? 'bg-purple-600/20 text-purple-400 border-purple-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
+          <div className="blue-card p-6 rounded-2xl space-y-4">
+            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
+              <div className={`p-2 rounded-xl border ${isDark ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
                 <User className="w-5 h-5" />
               </div>
               <div>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-emerald-800/80'}`}>User UUID (auth.uid):</span>
-                <p className={`font-mono truncate mt-0.5 ${isDark ? 'text-purple-300/70' : 'text-emerald-700/90'}`}>{user?.id}</p>
+                <p className={`font-mono truncate mt-0.5 ${isDark ? 'text-blue-300/70' : 'text-emerald-700/90'}`}>{user?.id}</p>
               </div>
             </div>
 
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                 placeholder="Your Name"
                 className={`w-full sm:max-w-md px-3.5 py-2 rounded-xl text-xs outline-none transition-all duration-200 ${
                   isDark
-                    ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                    ? 'bg-[#0f172a] border border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                     : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                 }`}
               />
@@ -207,10 +207,10 @@ export default function SettingsPage() {
           {/* Test Runner Settings Form */}
           <form
             onSubmit={handleSaveSettings}
-            className="purple-card p-6 rounded-2xl space-y-6"
+            className="blue-card p-6 rounded-2xl space-y-6"
           >
-            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
-              <div className={`p-2 rounded-xl border ${isDark ? 'bg-purple-600/20 text-purple-400 border-purple-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
+            <div className={`flex items-center gap-3 pb-3 border-b ${isDark ? 'border-blue-500/20' : 'border-emerald-200'}`}>
+              <div className={`p-2 rounded-xl border ${isDark ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
                 <Settings className="w-5 h-5" />
               </div>
               <div>
@@ -223,7 +223,7 @@ export default function SettingsPage() {
               {/* Theme Choice */}
               <div>
                 <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
-                  <Palette className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                  <Palette className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                   <span>Theme Choice</span>
                 </label>
                 <select
@@ -235,11 +235,11 @@ export default function SettingsPage() {
                   }}
                   className={`w-full px-3.5 py-2 rounded-xl text-xs font-semibold outline-none transition-all duration-200 ${
                     isDark
-                      ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      ? 'bg-[#0f172a] border border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                       : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                   }`}
                 >
-                  <option value="dark">Dark Theme (Kong Cosmic Purple &amp; Pitch Black)</option>
+                  <option value="dark">Dark Theme (Kong Cosmic Blue &amp; Pitch Black)</option>
                   <option value="light">Light Theme (Mint Green + Emerald + Deep Forest Green on Soft Off-White)</option>
                 </select>
                 <p className={`text-[11px] mt-1 ${isDark ? 'text-slate-500' : 'text-emerald-800/70'}`}>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
               {/* Request Timeout */}
               <div>
                 <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
-                  <Clock className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                  <Clock className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                   <span>Default Timeout (ms)</span>
                 </label>
                 <input
@@ -262,7 +262,7 @@ export default function SettingsPage() {
                   onChange={(e) => setTimeoutMs(e.target.value)}
                   className={`w-full px-3.5 py-2 rounded-xl font-mono text-xs outline-none transition-all duration-200 ${
                     isDark
-                      ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                      ? 'bg-[#0f172a] border border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                       : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                   }`}
                 />
@@ -275,7 +275,7 @@ export default function SettingsPage() {
             {/* Default Headers */}
             <div>
               <label className={`block text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-[#064e3b]'}`}>
-                <Terminal className={`w-4 h-4 ${isDark ? 'text-purple-400' : 'text-emerald-600'}`} />
+                <Terminal className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-emerald-600'}`} />
                 <span>Default Request Headers (JSON)</span>
               </label>
               <textarea
@@ -284,7 +284,7 @@ export default function SettingsPage() {
                 onChange={(e) => setDefaultHeaders(e.target.value)}
                 className={`w-full p-3 rounded-xl font-mono text-xs outline-none transition-all duration-200 ${
                   isDark
-                    ? 'bg-[#141033] border border-purple-500/30 text-white focus:border-purple-400 focus:bg-[#1a1542]'
+                    ? 'bg-[#0f172a] border border-blue-500/30 text-white focus:border-blue-400 focus:bg-[#1e293b]'
                     : 'bg-[#f4f8f6] border border-emerald-300 text-emerald-950 focus:border-emerald-500 focus:bg-white'
                 }`}
                 placeholder='{ "Accept": "application/json" }'
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                 disabled={saving}
                 className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all duration-200 active:scale-[0.98] disabled:opacity-50 text-white ${
                   isDark
-                    ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                    ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                     : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
                 }`}
               >
