@@ -593,26 +593,72 @@ export default function TesterPage() {
 
     setLoading(true);
     setSaveStatus('');
+    setLoadTestState(null);
+    setIsLoadTesting(false);
     const finalHeaders = buildFinalHeaders();
 
     try {
-      const res = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: finalUrl,
-          method,
-          headers: finalHeaders,
-          body: ['POST', 'PUT', 'PATCH'].includes(method) ? bodyText : undefined,
-          timeoutMs: 15000,
-        }),
-      });
+      let data;
+      try {
+        const res = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: finalUrl,
+            method,
+            headers: finalHeaders,
+            body: ['POST', 'PUT', 'PATCH'].includes(method) ? bodyText : undefined,
+            timeoutMs: 15000,
+          }),
+        });
+        data = await res.json();
+      } catch (proxyFetchErr) {
+        console.warn('[API Sentinel] Proxy unavailable, attempting direct fetch fallback:', proxyFetchErr);
+      }
 
-      const data = await res.json();
+      // If proxy failed or reported network error, attempt direct client fetch fallback
+      if (!data || !data.ok) {
+        try {
+          const directStart = performance.now();
+          const directFetchOptions = {
+            method,
+            headers: finalHeaders,
+          };
+          if (['POST', 'PUT', 'PATCH'].includes(method) && bodyText) {
+            directFetchOptions.body = bodyText;
+          }
+          const directRes = await fetch(finalUrl, directFetchOptions);
+          const directEnd = performance.now();
+          const directText = await directRes.text();
+          const directHeaders = {};
+          directRes.headers.forEach((val, key) => {
+            directHeaders[key] = val;
+          });
 
-      if (data.ok) {
+          data = {
+            ok: true,
+            status: directRes.status,
+            statusText: directRes.statusText || 'OK',
+            headers: directHeaders,
+            body: directText,
+            timeMs: Math.round(directEnd - directStart),
+            sizeBytes: new Blob([directText]).size,
+          };
+        } catch (directErr) {
+          // If direct fetch also fails (e.g. CORS), keep the proxy error message or report unreachable
+          if (!data) {
+            data = {
+              ok: false,
+              errorType: 'network',
+              message: directErr.message || 'Network request failed',
+            };
+          }
+        }
+      }
+
+      if (data && data.ok) {
         const valResults = evaluateValidationRules(data.status, data.timeMs || 0, data.body || '');
 
         const meta = {
@@ -643,6 +689,24 @@ export default function TesterPage() {
         };
         setLocalHistory((prev) => [historyItem, ...prev]);
 
+        // Sync with local storage history immediately
+        try {
+          const stored = JSON.parse(localStorage.getItem('sentinel_request_history') || '[]');
+          stored.unshift({
+            id: 'req-' + Date.now(),
+            method,
+            url: finalUrl,
+            status: data.status,
+            response_time_ms: data.timeMs || 0,
+            passed: valResults.totalPassed,
+            failed: valResults.totalFailed,
+            created_at: new Date().toISOString(),
+          });
+          localStorage.setItem('sentinel_request_history', JSON.stringify(stored.slice(0, 100)));
+        } catch (storageErr) {
+          console.warn('[API Sentinel] Error syncing local history:', storageErr);
+        }
+
         // Record in Supabase if logged in
         if (user) {
           try {
@@ -664,9 +728,9 @@ export default function TesterPage() {
         const meta = {
           ok: false,
           status: 0,
-          statusText: data.errorType ? `Error: ${data.errorType}` : 'Request Failed',
+          statusText: data?.errorType ? `Error: ${data.errorType}` : 'Request Failed',
           headers: {},
-          body: `Proxy Error (${data.errorType || 'network'}):\n${data.message || 'Target server unreachable'}`,
+          body: `Proxy Error (${data?.errorType || 'network'}):\n${data?.message || 'Target server unreachable'}`,
           timeMs: 0,
           sizeBytes: 0,
           validation: valResults,
@@ -680,7 +744,7 @@ export default function TesterPage() {
         status: 0,
         statusText: 'Proxy Unreachable',
         headers: {},
-        body: `Local proxy connection error:\n${err.message}`,
+        body: `Connection error:\n${err.message}`,
         timeMs: 0,
         sizeBytes: 0,
         validation: valResults,
