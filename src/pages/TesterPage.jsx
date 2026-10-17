@@ -36,6 +36,7 @@ import {
   BarChart2,
   Flame,
   X,
+  Zap,
 } from 'lucide-react';
 
 // Quick Preset Examples
