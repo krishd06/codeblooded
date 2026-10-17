@@ -55,8 +55,8 @@ export default function LandingPage() {
           style={{
             background: isDark
               ? `
-                radial-gradient(ellipse 95% 58% at 50% 64%, rgba(142, 32, 240, 0.85) 0%, rgba(105, 14, 198, 0.6) 28%, rgba(55, 6, 115, 0.32) 55%, transparent 76%),
-                linear-gradient(180deg, #000000 0%, #000000 30%, #0a0115 42%, #1e023c 54%, #350462 66%, #220242 80%, #0a0114 92%, #000000 100%)
+                radial-gradient(ellipse 95% 58% at 50% 64%, rgba(37, 99, 235, 0.85) 0%, rgba(29, 78, 216, 0.6) 28%, rgba(15, 23, 42, 0.4) 55%, transparent 76%),
+                linear-gradient(180deg, #000000 0%, #000000 30%, #020617 42%, #0b193d 54%, #0f2766 66%, #0b193d 80%, #020617 92%, #000000 100%)
               `
               : `
                 radial-gradient(ellipse 95% 58% at 50% 64%, rgba(52, 211, 153, 0.55) 0%, rgba(16, 185, 129, 0.35) 28%, rgba(5, 150, 105, 0.14) 55%, transparent 76%),
@@ -70,14 +70,14 @@ export default function LandingPage() {
           <div
             className={`inline-flex items-center gap-2 px-5 py-1.5 rounded-md border text-xs sm:text-[13px] font-medium shadow-md transition-all duration-200 cursor-pointer group ${
               isDark
-                ? 'bg-[#25109b] hover:bg-[#2e15b5] border-purple-500/30 text-white shadow-indigo-950/50'
+                ? 'bg-[#172554] hover:bg-[#1e3a8a] border-blue-500/30 text-white shadow-blue-950/50'
                 : 'bg-[#064e3b] hover:bg-[#065f46] border-emerald-400/50 text-[#a7f3d0] shadow-emerald-900/10'
             }`}
           >
             <span>Announcing Kong Insomnia 10 GA with unlimited Collection Runner for testing APIs and the new AI Runner GenAI infrastructure offering</span>
             <span
               className={`font-bold group-hover:translate-x-1 transition-transform inline-block ${
-                isDark ? 'text-purple-200' : 'text-emerald-200'
+                isDark ? 'text-blue-200' : 'text-emerald-200'
               }`}
             >
               →
@@ -97,7 +97,7 @@ export default function LandingPage() {
             {/* Hero Subtitle */}
             <p
               className={`text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-normal pt-1 ${
-                isDark ? 'text-[#c4bed8]' : 'text-[#065f46]'
+                isDark ? 'text-[#bfdbfe]' : 'text-[#065f46]'
               }`}
             >
               Build better APIs collaboratively for the most popular protocols with a dev-friendly UI, built-in
@@ -112,7 +112,7 @@ export default function LandingPage() {
                 to="/tester"
                 className={`px-6 py-2.5 rounded-md font-bold text-sm shadow-md transition-all duration-200 active:scale-[0.98] ${
                   isDark
-                    ? 'bg-white hover:bg-slate-100 text-[#0c0926] shadow-black/40'
+                    ? 'bg-white hover:bg-slate-100 text-[#091e42] shadow-black/40'
                     : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-700/25'
                 }`}
               >
@@ -124,7 +124,7 @@ export default function LandingPage() {
                 onClick={() => openAuthModal('register')}
                 className={`px-6 py-2.5 rounded-md font-bold text-sm shadow-md transition-all duration-200 active:scale-[0.98] ${
                   isDark
-                    ? 'bg-white hover:bg-slate-100 text-[#0c0926] shadow-black/40'
+                    ? 'bg-white hover:bg-slate-100 text-[#091e42] shadow-black/40'
                     : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-700/25'
                 }`}
               >
@@ -164,29 +164,29 @@ export default function LandingPage() {
 
               {/* Left Fan of Curved Laser Rays */}
               <g opacity={isDark ? 0.92 : 0.85}>
-                <path d="M 300 240 C 200 220, 80 160, 0 120" stroke={isDark ? '#c084fc' : '#6ee7b7'} strokeWidth="1" opacity="0.4" />
-                <path d="M 300 260 C 190 245, 70 190, 0 160" stroke={isDark ? '#a855f7' : '#34d399'} strokeWidth="1.1" opacity="0.5" />
-                <path d="M 300 280 C 180 270, 60 220, 0 200" stroke={isDark ? '#9333ea' : '#10b981'} strokeWidth="1.2" opacity="0.6" />
-                <path d="M 300 300 C 170 295, 50 250, 0 240" stroke={isDark ? '#8b5cf6' : '#059669'} strokeWidth="1.3" opacity="0.65" />
-                <path d="M 300 320 C 160 320, 40 285, 0 280" stroke={isDark ? '#7c3aed' : '#047857'} strokeWidth="1.4" opacity="0.75" />
-                <path d="M 300 340 C 150 350, 30 325, 0 325" stroke={isDark ? '#6d28d9' : '#065f46'} strokeWidth="1.5" opacity="0.8" />
-                <path d="M 300 365 C 140 385, 20 375, 0 380" stroke={isDark ? '#9333ea' : '#059669'} strokeWidth="1.6" opacity="0.85" />
-                <path d="M 300 390 C 130 425, 10 435, 0 445" stroke={isDark ? '#c026d3' : '#10b981'} strokeWidth="1.8" opacity="0.9" />
+                <path d="M 300 240 C 200 220, 80 160, 0 120" stroke={isDark ? '#60a5fa' : '#6ee7b7'} strokeWidth="1" opacity="0.4" />
+                <path d="M 300 260 C 190 245, 70 190, 0 160" stroke={isDark ? '#3b82f6' : '#34d399'} strokeWidth="1.1" opacity="0.5" />
+                <path d="M 300 280 C 180 270, 60 220, 0 200" stroke={isDark ? '#2563eb' : '#10b981'} strokeWidth="1.2" opacity="0.6" />
+                <path d="M 300 300 C 170 295, 50 250, 0 240" stroke={isDark ? '#1d4ed8' : '#059669'} strokeWidth="1.3" opacity="0.65" />
+                <path d="M 300 320 C 160 320, 40 285, 0 280" stroke={isDark ? '#2563eb' : '#047857'} strokeWidth="1.4" opacity="0.75" />
+                <path d="M 300 340 C 150 350, 30 325, 0 325" stroke={isDark ? '#1e40af' : '#065f46'} strokeWidth="1.5" opacity="0.8" />
+                <path d="M 300 365 C 140 385, 20 375, 0 380" stroke={isDark ? '#2563eb' : '#059669'} strokeWidth="1.6" opacity="0.85" />
+                <path d="M 300 390 C 130 425, 10 435, 0 445" stroke={isDark ? '#0284c7' : '#10b981'} strokeWidth="1.8" opacity="0.9" />
                 {/* Distinct Lower Reddish/Pink Arc */}
                 <path d="M 300 415 C 120 470, 5 495, 0 510" stroke={isDark ? '#ff2a5f' : '#e11d48'} strokeWidth="2.5" opacity="0.95" />
               </g>
 
               {/* Right Fan of Curved Laser Rays */}
               <g opacity={isDark ? 0.94 : 0.88}>
-                <path d="M 980 240 C 1080 220, 1200 160, 1280 120" stroke={isDark ? '#c084fc' : '#6ee7b7'} strokeWidth="1" opacity="0.4" />
-                <path d="M 980 260 C 1090 245, 1210 190, 1280 160" stroke={isDark ? '#a855f7' : '#34d399'} strokeWidth="1.1" opacity="0.5" />
-                <path d="M 980 280 C 1100 270, 1220 220, 1280 200" stroke={isDark ? '#9333ea' : '#10b981'} strokeWidth="1.2" opacity="0.6" />
-                <path d="M 980 300 C 1110 295, 1230 250, 1280 240" stroke={isDark ? '#8b5cf6' : '#059669'} strokeWidth="1.3" opacity="0.65" />
-                <path d="M 980 320 C 1120 320, 1240 285, 1280 280" stroke={isDark ? '#7c3aed' : '#047857'} strokeWidth="1.4" opacity="0.75" />
-                <path d="M 980 340 C 1130 350, 1250 325, 1280 325" stroke={isDark ? '#6d28d9' : '#065f46'} strokeWidth="1.5" opacity="0.8" />
-                <path d="M 980 365 C 1140 385, 1260 375, 1280 380" stroke={isDark ? '#9333ea' : '#059669'} strokeWidth="1.6" opacity="0.85" />
-                <path d="M 980 390 C 1150 425, 1270 435, 1280 445" stroke={isDark ? '#a855f7' : '#10b981'} strokeWidth="1.8" opacity="0.9" />
-                <path d="M 980 415 C 1160 470, 1275 495, 1280 510" stroke={isDark ? '#8b5cf6' : '#34d399'} strokeWidth="1.9" opacity="0.9" />
+                <path d="M 980 240 C 1080 220, 1200 160, 1280 120" stroke={isDark ? '#60a5fa' : '#6ee7b7'} strokeWidth="1" opacity="0.4" />
+                <path d="M 980 260 C 1090 245, 1210 190, 1280 160" stroke={isDark ? '#3b82f6' : '#34d399'} strokeWidth="1.1" opacity="0.5" />
+                <path d="M 980 280 C 1100 270, 1220 220, 1280 200" stroke={isDark ? '#2563eb' : '#10b981'} strokeWidth="1.2" opacity="0.6" />
+                <path d="M 980 300 C 1110 295, 1230 250, 1280 240" stroke={isDark ? '#1d4ed8' : '#059669'} strokeWidth="1.3" opacity="0.65" />
+                <path d="M 980 320 C 1120 320, 1240 285, 1280 280" stroke={isDark ? '#2563eb' : '#047857'} strokeWidth="1.4" opacity="0.75" />
+                <path d="M 980 340 C 1130 350, 1250 325, 1280 325" stroke={isDark ? '#1e40af' : '#065f46'} strokeWidth="1.5" opacity="0.8" />
+                <path d="M 980 365 C 1140 385, 1260 375, 1280 380" stroke={isDark ? '#2563eb' : '#059669'} strokeWidth="1.6" opacity="0.85" />
+                <path d="M 980 390 C 1150 425, 1270 435, 1280 445" stroke={isDark ? '#3b82f6' : '#10b981'} strokeWidth="1.8" opacity="0.9" />
+                <path d="M 980 415 C 1160 470, 1275 495, 1280 510" stroke={isDark ? '#1d4ed8' : '#34d399'} strokeWidth="1.9" opacity="0.9" />
 
                 {/* Glowing Shooting Comet / Meteor with Neon-Green Head */}
                 <path
@@ -197,7 +197,7 @@ export default function LandingPage() {
                   opacity="0.95"
                 />
                 <g transform="translate(1185, 337)">
-                  <circle cx="0" cy="0" r="16" fill={isDark ? '#c084fc' : '#34d399'} opacity="0.55" filter="url(#glowEffect)" />
+                  <circle cx="0" cy="0" r="16" fill={isDark ? '#60a5fa' : '#34d399'} opacity="0.55" filter="url(#glowEffect)" />
                   <circle cx="0" cy="0" r="6" fill="#4ade80" />
                   <circle cx="0" cy="0" r="3" fill="#ffffff" />
                 </g>
@@ -209,7 +209,7 @@ export default function LandingPage() {
           <div
             className={`rounded-xl border shadow-2xl overflow-hidden text-left max-w-4xl mx-auto transition-all duration-300 ${
               isDark
-                ? 'border-[#282830] bg-[#141416] shadow-purple-950/90'
+                ? 'border-[#1e293b] bg-[#0c1222] shadow-blue-950/90'
                 : 'border-[#a7f3d0] bg-white shadow-emerald-950/15'
             }`}
           >
@@ -217,7 +217,7 @@ export default function LandingPage() {
             <div
               className={`flex items-center justify-between px-3.5 py-2.5 border-b text-xs transition-colors duration-200 ${
                 isDark
-                  ? 'bg-[#17171a] border-[#282830] text-slate-200'
+                  ? 'bg-[#0f172a] border-[#1e293b] text-slate-200'
                   : 'bg-[#f0fdf4] border-[#d1fae5] text-[#064e3b]'
               }`}
             >
@@ -225,7 +225,7 @@ export default function LandingPage() {
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm ${
                     isDark
-                      ? 'bg-gradient-to-tr from-purple-600 to-indigo-500'
+                      ? 'bg-gradient-to-tr from-blue-600 to-indigo-500'
                       : 'bg-gradient-to-tr from-emerald-600 to-teal-700'
                   }`}
                 >
@@ -259,19 +259,19 @@ export default function LandingPage() {
                   to="/tester"
                   className={`px-2.5 py-1 rounded border text-xs font-semibold flex items-center gap-1 transition-colors ${
                     isDark
-                      ? 'bg-[#27272e] hover:bg-[#34343d] border-[#383842] text-slate-200'
+                      ? 'bg-[#1e293b] hover:bg-[#334155] border-[#334155] text-slate-200'
                       : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900'
                   }`}
                 >
                   <Plus className="w-3 h-3" />
                   <span>Create</span>
                 </Link>
-                <div className="w-5 h-5 rounded-full bg-emerald-700 text-[10px] text-white font-bold flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full bg-blue-700 text-[10px] text-white font-bold flex items-center justify-center">
                   👤
                 </div>
                 <span
                   className={`px-2 py-0.5 rounded text-white text-[10px] font-bold shadow-sm ${
-                    isDark ? 'bg-purple-600' : 'bg-emerald-600'
+                    isDark ? 'bg-blue-600' : 'bg-emerald-600'
                   }`}
                 >
                   Upgrade
@@ -285,14 +285,14 @@ export default function LandingPage() {
               <div
                 className={`col-span-1 sm:col-span-1 border-r py-3 flex flex-col items-center justify-between ${
                   isDark
-                    ? 'bg-[#111113] border-[#24242a] text-slate-400'
+                    ? 'bg-[#0b1120] border-[#1e293b] text-slate-400'
                     : 'bg-[#ecfdf5] border-[#d1fae5] text-emerald-800'
                 }`}
               >
                 <div className="flex flex-col items-center gap-3.5">
                   <div
                     className={`w-6 h-6 rounded-md flex items-center justify-center cursor-pointer ${
-                      isDark ? 'bg-purple-600/30 text-purple-300' : 'bg-emerald-600/20 text-emerald-900'
+                      isDark ? 'bg-blue-600/30 text-blue-300' : 'bg-emerald-600/20 text-emerald-900'
                     }`}
                   >
                     <Home className="w-3.5 h-3.5" />
@@ -311,7 +311,7 @@ export default function LandingPage() {
                     title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
                     className="w-6 h-6 rounded-md hover:bg-black/10 flex items-center justify-center cursor-pointer transition-colors"
                   >
-                    {isDark ? <Moon className="w-3.5 h-3.5 text-purple-300" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
+                    {isDark ? <Moon className="w-3.5 h-3.5 text-blue-300" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
                   </div>
                   <div className="w-6 h-6 rounded-md hover:bg-black/5 flex items-center justify-center cursor-pointer">
                     <Plus className="w-3.5 h-3.5" />
@@ -323,7 +323,7 @@ export default function LandingPage() {
               <div
                 className={`col-span-3 sm:col-span-3 border-r p-3 text-xs space-y-4 ${
                   isDark
-                    ? 'bg-[#151518] border-[#26262d] text-slate-400'
+                    ? 'bg-[#0f172a] border-[#1e293b] text-slate-400'
                     : 'bg-[#f7fcf9] border-[#d1fae5] text-emerald-900'
                 }`}
               >
@@ -342,10 +342,10 @@ export default function LandingPage() {
                   <div className="space-y-0.5 pt-1">
                     <div
                       className={`px-2 py-1 rounded font-medium flex items-center gap-2 ${
-                        isDark ? 'bg-[#24242c] text-white' : 'bg-emerald-100 text-[#064e3b]'
+                        isDark ? 'bg-[#1e293b] text-white' : 'bg-emerald-100 text-[#064e3b]'
                       }`}
                     >
-                      <Globe className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-700'}`} />
+                      <Globe className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`} />
                       <span>Konnect</span>
                     </div>
                     <div
@@ -359,7 +359,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className={`space-y-1 pt-2 border-t ${isDark ? 'border-[#26262d]' : 'border-[#d1fae5]'}`}>
+                <div className={`space-y-1 pt-2 border-t ${isDark ? 'border-[#1e293b]' : 'border-[#d1fae5]'}`}>
                   <div
                     className={`flex items-center justify-between text-[10px] font-bold uppercase tracking-wider ${
                       isDark ? 'text-slate-400' : 'text-emerald-800'
@@ -374,7 +374,7 @@ export default function LandingPage() {
                       }`}
                     >
                       <span className="flex items-center gap-2">
-                        <Folder className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-700'}`} /> Collections (2)
+                        <Folder className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`} /> Collections (2)
                       </span>
                       <span>+</span>
                     </div>
@@ -407,14 +407,14 @@ export default function LandingPage() {
               </div>
 
               {/* Right Tiles Grid */}
-              <div className={`col-span-8 sm:col-span-8 p-4 space-y-3 ${isDark ? 'bg-[#0e0e11]' : 'bg-[#f4fbf6]'}`}>
+              <div className={`col-span-8 sm:col-span-8 p-4 space-y-3 ${isDark ? 'bg-[#080d1a]' : 'bg-[#f4fbf6]'}`}>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Tile 1 */}
                   <Link
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -427,7 +427,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Cloud OS Login
@@ -436,7 +436,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>Open API</span>
@@ -449,7 +449,7 @@ export default function LandingPage() {
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -457,7 +457,7 @@ export default function LandingPage() {
                       <span
                         className={`text-[10px] font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 ${
                           isDark
-                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                            ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
                             : 'bg-emerald-100 text-emerald-800 border-emerald-300'
                         }`}
                       >
@@ -468,7 +468,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Google Play Partner
@@ -477,7 +477,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>feat/new-paths</span>
@@ -490,7 +490,7 @@ export default function LandingPage() {
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -503,7 +503,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Cloud OS Login
@@ -512,7 +512,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>Open API</span>
@@ -527,7 +527,7 @@ export default function LandingPage() {
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -540,7 +540,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Cloud OS Login
@@ -549,7 +549,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>Open API</span>
@@ -562,7 +562,7 @@ export default function LandingPage() {
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -570,7 +570,7 @@ export default function LandingPage() {
                       <span
                         className={`text-[10px] font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 ${
                           isDark
-                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                            ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
                             : 'bg-emerald-100 text-emerald-800 border-emerald-300'
                         }`}
                       >
@@ -581,7 +581,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Google Play Partner
@@ -590,7 +590,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>feat/new-paths</span>
@@ -603,7 +603,7 @@ export default function LandingPage() {
                     to="/tester"
                     className={`p-3 rounded-lg border transition-colors space-y-2 group block ${
                       isDark
-                        ? 'bg-[#161619] border-[#27272f] hover:border-purple-500/50'
+                        ? 'bg-[#0f172a] border-[#1e293b] hover:border-blue-500/50'
                         : 'bg-white border-[#d1fae5] hover:border-emerald-400 shadow-sm'
                     }`}
                   >
@@ -616,7 +616,7 @@ export default function LandingPage() {
                     <div>
                       <h4
                         className={`text-xs font-bold ${
-                          isDark ? 'text-white group-hover:text-purple-300' : 'text-[#064e3b] group-hover:text-emerald-700'
+                          isDark ? 'text-white group-hover:text-blue-300' : 'text-[#064e3b] group-hover:text-emerald-700'
                         }`}
                       >
                         Cloud OS Login
@@ -625,7 +625,7 @@ export default function LandingPage() {
                     </div>
                     <div
                       className={`text-[10px] pt-1 border-t flex items-center justify-between ${
-                        isDark ? 'border-[#25252c] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
+                        isDark ? 'border-[#1e293b] text-slate-400' : 'border-[#d1fae5] text-emerald-800/70'
                       }`}
                     >
                       <span>Open API</span>
@@ -640,7 +640,7 @@ export default function LandingPage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 2: KEY FEATURES (Scrollable, styled with dark purple & glass / light emerald) */}
+      {/* SECTION 2: KEY FEATURES (Scrollable, styled with dark blue & glass / light emerald) */}
       {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-2.5 max-w-xl mx-auto">
@@ -649,7 +649,7 @@ export default function LandingPage() {
             <div
               className={`w-6 h-6 rounded-lg text-white flex items-center justify-center font-mono font-bold text-xs shadow-md ${
                 isDark
-                  ? 'bg-gradient-to-br from-purple-600 to-indigo-600 shadow-purple-600/30'
+                  ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-600/30'
                   : 'bg-gradient-to-br from-emerald-600 to-teal-800 shadow-emerald-600/30'
               }`}
             >
@@ -665,20 +665,20 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center justify-center gap-3">
-            <span className={`w-8 h-0.5 ${isDark ? 'bg-purple-500/40' : 'bg-emerald-500/40'}`}></span>
+            <span className={`w-8 h-0.5 ${isDark ? 'bg-blue-500/40' : 'bg-emerald-500/40'}`}></span>
             <h2
               className={`text-2xl font-bold tracking-tight ${
-                isDark ? 'text-purple-400' : 'text-emerald-700'
+                isDark ? 'text-blue-400' : 'text-emerald-700'
               }`}
             >
               Key Features
             </h2>
-            <span className={`w-8 h-0.5 ${isDark ? 'bg-purple-500/40' : 'bg-emerald-500/40'}`}></span>
+            <span className={`w-8 h-0.5 ${isDark ? 'bg-blue-500/40' : 'bg-emerald-500/40'}`}></span>
           </div>
 
           <p
             className={`text-xs font-semibold tracking-wide uppercase ${
-              isDark ? 'text-purple-200/60' : 'text-emerald-800/80'
+              isDark ? 'text-blue-200/70' : 'text-emerald-800/80'
             }`}
           >
             Test • Validate • Build Better APIs
@@ -692,7 +692,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -716,7 +716,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -740,7 +740,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -764,7 +764,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -788,7 +788,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -812,7 +812,7 @@ export default function LandingPage() {
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isDark
-                  ? 'bg-purple-600/20 border border-purple-500/30 text-purple-400'
+                  ? 'bg-blue-600/20 border border-blue-500/30 text-blue-400'
                   : 'bg-emerald-100 border border-emerald-300 text-emerald-800'
               }`}
             >
@@ -847,7 +847,7 @@ export default function LandingPage() {
           </h2>
           <p
             className={`text-xs font-medium ${
-              isDark ? 'text-purple-200/70' : 'text-emerald-800/80'
+              isDark ? 'text-blue-200/70' : 'text-emerald-800/80'
             }`}
           >
             Seamless four-step execution pipeline built for developer productivity
@@ -860,7 +860,7 @@ export default function LandingPage() {
           <div
             className={`hidden lg:block absolute top-6 left-12 right-12 h-0.5 z-0 ${
               isDark
-                ? 'bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600'
                 : 'bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400'
             }`}
           ></div>
@@ -872,7 +872,7 @@ export default function LandingPage() {
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
                     isDark
-                      ? 'border border-purple-400 text-purple-300 bg-[#140b2e]'
+                      ? 'border border-blue-400 text-blue-300 bg-[#0c1a3a]'
                       : 'border border-emerald-400 text-emerald-800 bg-emerald-50'
                   }`}
                 >
@@ -881,7 +881,7 @@ export default function LandingPage() {
                 <div
                   className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                     isDark
-                      ? 'bg-purple-600/20 text-purple-400'
+                      ? 'bg-blue-600/20 text-blue-400'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}
                 >
@@ -907,7 +907,7 @@ export default function LandingPage() {
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
                     isDark
-                      ? 'border border-purple-400 text-purple-300 bg-[#140b2e]'
+                      ? 'border border-blue-400 text-blue-300 bg-[#0c1a3a]'
                       : 'border border-emerald-400 text-emerald-800 bg-emerald-50'
                   }`}
                 >
@@ -916,7 +916,7 @@ export default function LandingPage() {
                 <div
                   className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                     isDark
-                      ? 'bg-purple-600/20 text-purple-400'
+                      ? 'bg-blue-600/20 text-blue-400'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}
                 >
@@ -942,7 +942,7 @@ export default function LandingPage() {
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
                     isDark
-                      ? 'border border-purple-400 text-purple-300 bg-[#140b2e]'
+                      ? 'border border-blue-400 text-blue-300 bg-[#0c1a3a]'
                       : 'border border-emerald-400 text-emerald-800 bg-emerald-50'
                   }`}
                 >
@@ -951,7 +951,7 @@ export default function LandingPage() {
                 <div
                   className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                     isDark
-                      ? 'bg-purple-600/20 text-purple-400'
+                      ? 'bg-blue-600/20 text-blue-400'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}
                 >
@@ -977,7 +977,7 @@ export default function LandingPage() {
                 <span
                   className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
                     isDark
-                      ? 'border border-purple-400 text-purple-300 bg-[#140b2e]'
+                      ? 'border border-blue-400 text-blue-300 bg-[#0c1a3a]'
                       : 'border border-emerald-400 text-emerald-800 bg-emerald-50'
                   }`}
                 >
@@ -986,7 +986,7 @@ export default function LandingPage() {
                 <div
                   className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                     isDark
-                      ? 'bg-purple-600/20 text-purple-400'
+                      ? 'bg-blue-600/20 text-blue-400'
                       : 'bg-emerald-100 text-emerald-700'
                   }`}
                 >
@@ -1016,7 +1016,7 @@ export default function LandingPage() {
         <div className="text-center space-y-2">
           <p
             className={`font-mono text-xs ${
-              isDark ? 'text-purple-300/70' : 'text-emerald-800/80'
+              isDark ? 'text-blue-300/70' : 'text-emerald-800/80'
             }`}
           >
             Prices shown in INR for India. We detect your market from timezone and locale.
@@ -1053,7 +1053,7 @@ export default function LandingPage() {
               <div
                 className={`space-y-2.5 pt-4 border-t text-xs ${
                   isDark
-                    ? 'border-purple-500/20 text-slate-300'
+                    ? 'border-blue-500/20 text-slate-300'
                     : 'border-emerald-200 text-emerald-900/90'
                 }`}
               >
@@ -1140,7 +1140,7 @@ export default function LandingPage() {
               <div
                 className={`space-y-2.5 pt-4 border-t text-xs ${
                   isDark
-                    ? 'border-purple-500/20 text-slate-300'
+                    ? 'border-blue-500/20 text-slate-300'
                     : 'border-emerald-200 text-emerald-900/90'
                 }`}
               >
@@ -1202,7 +1202,7 @@ export default function LandingPage() {
           <div
             className={`purple-card p-6 rounded-2xl flex flex-col justify-between space-y-6 relative ${
               isDark
-                ? 'border-purple-500 shadow-xl shadow-purple-900/30'
+                ? 'border-blue-500 shadow-xl shadow-blue-900/30'
                 : 'border-emerald-500 shadow-xl shadow-emerald-900/15'
             }`}
           >
@@ -1210,14 +1210,14 @@ export default function LandingPage() {
               <div className="flex items-center justify-between">
                 <span
                   className={`text-[11px] font-bold uppercase tracking-wider ${
-                    isDark ? 'text-purple-300' : 'text-emerald-800'
+                    isDark ? 'text-blue-300' : 'text-emerald-800'
                   }`}
                 >
                   GROWTH
                 </span>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm ${
-                    isDark ? 'bg-purple-600' : 'bg-emerald-600'
+                    isDark ? 'bg-blue-600' : 'bg-emerald-600'
                   }`}
                 >
                   MOST POPULAR
@@ -1237,7 +1237,7 @@ export default function LandingPage() {
                 </div>
                 <div
                   className={`text-xs ${
-                    isDark ? 'text-purple-200/70' : 'text-emerald-800/80 font-medium'
+                    isDark ? 'text-blue-200/70' : 'text-emerald-800/80 font-medium'
                   }`}
                 >
                   30M requests • 15K RPS
@@ -1247,7 +1247,7 @@ export default function LandingPage() {
               <div
                 className={`space-y-2.5 pt-4 border-t text-xs ${
                   isDark
-                    ? 'border-purple-500/20 text-slate-300'
+                    ? 'border-blue-500/20 text-slate-300'
                     : 'border-emerald-200 text-emerald-900/90'
                 }`}
               >
@@ -1297,7 +1297,7 @@ export default function LandingPage() {
               onClick={() => openAuthModal('register')}
               className={`w-full py-2.5 px-4 rounded-lg text-white font-bold text-xs shadow-md transition-all duration-200 ${
                 isDark
-                  ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                  ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                   : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30'
               }`}
             >
@@ -1334,7 +1334,7 @@ export default function LandingPage() {
               <div
                 className={`space-y-2.5 pt-4 border-t text-xs ${
                   isDark
-                    ? 'border-purple-500/20 text-slate-300'
+                    ? 'border-blue-500/20 text-slate-300'
                     : 'border-emerald-200 text-emerald-900/90'
                 }`}
               >

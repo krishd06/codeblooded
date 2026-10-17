@@ -74,7 +74,7 @@ export default function Layout() {
     <div
       className={`min-h-screen flex flex-col font-sans relative overflow-x-hidden transition-colors duration-300 ${
         isDark
-          ? 'bg-[#000000] text-slate-100 selection:bg-purple-600 selection:text-white'
+          ? 'bg-[#000000] text-slate-100 selection:bg-blue-600 selection:text-white'
           : 'bg-[#f4f8f6] text-[#064e3b] selection:bg-emerald-500 selection:text-white'
       }`}
     >
@@ -97,7 +97,7 @@ export default function Layout() {
                 <div
                   className={`w-9 h-9 rounded-xl text-white flex items-center justify-center font-mono font-bold text-sm shadow-lg group-hover:scale-105 transition-all duration-200 ${
                     isDark
-                      ? 'bg-gradient-to-br from-purple-600 to-indigo-600 shadow-purple-600/30'
+                      ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-600/30'
                       : 'bg-gradient-to-br from-emerald-600 to-teal-800 shadow-emerald-600/30'
                   }`}
                 >
@@ -108,7 +108,7 @@ export default function Layout() {
                     <span
                       className={`font-extrabold text-base sm:text-lg tracking-tight transition-all duration-200 ${
                         isDark
-                          ? 'text-white group-hover:text-purple-300'
+                          ? 'text-white group-hover:text-blue-300'
                           : 'text-[#064e3b] group-hover:text-emerald-700'
                       }`}
                     >
@@ -117,7 +117,7 @@ export default function Layout() {
                     <span
                       className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full border ${
                         isDark
-                          ? 'bg-purple-950 text-purple-300 border-purple-800/60'
+                          ? 'bg-blue-950 text-blue-300 border-blue-800/60'
                           : 'bg-emerald-100 text-emerald-800 border-emerald-300'
                       }`}
                     >
@@ -146,7 +146,7 @@ export default function Layout() {
                         `flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                           isActive
                             ? isDark
-                              ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30 shadow-sm'
+                              ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30 shadow-sm'
                               : 'bg-emerald-600/15 text-[#064e3b] border border-emerald-500/30 font-bold shadow-sm'
                             : isDark
                             ? 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -159,7 +159,7 @@ export default function Layout() {
                       {item.isProtected && !user && (
                         <Lock
                           className={`w-3 h-3 ml-0.5 ${
-                            isDark ? 'text-purple-400/50' : 'text-emerald-600/50'
+                            isDark ? 'text-blue-400/50' : 'text-emerald-600/50'
                           }`}
                         />
                       )}
@@ -183,7 +183,7 @@ export default function Layout() {
                 title={
                   isDark
                     ? 'Switch to Light Theme (Mint Green & Emerald)'
-                    : 'Switch to Dark Theme (Cosmic Purple)'
+                    : 'Switch to Dark Theme (Sapphire Blue)'
                 }
                 aria-label="Toggle theme"
               >
@@ -204,7 +204,7 @@ export default function Layout() {
                 to="/tester"
                 className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white shadow-md transition-all duration-200 active:scale-[0.98] ${
                   isDark
-                    ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                    ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
                     : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
                 }`}
               >
@@ -217,13 +217,13 @@ export default function Layout() {
                   <div
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
                       isDark
-                        ? 'bg-[#140b2e] border-purple-500/30'
+                        ? 'bg-[#0f172a] border-blue-500/30'
                         : 'bg-emerald-50 border-emerald-200'
                     }`}
                   >
                     <div
                       className={`w-6 h-6 rounded-full text-white font-bold flex items-center justify-center text-[11px] ${
-                        isDark ? 'bg-purple-600' : 'bg-emerald-700'
+                        isDark ? 'bg-blue-600' : 'bg-emerald-700'
                       }`}
                     >
                       {user.email?.charAt(0).toUpperCase() || 'U'}
@@ -261,7 +261,7 @@ export default function Layout() {
                   }`}
                 >
                   <User
-                    className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-700'}`}
+                    className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`}
                   />
                   <span>Sign In</span>
                 </button>
@@ -299,7 +299,7 @@ export default function Layout() {
           <div
             className={`md:hidden border-b px-4 pt-2 pb-4 space-y-1 ${
               isDark
-                ? 'border-purple-900/40 bg-[#080214]'
+                ? 'border-blue-900/40 bg-[#080d1a]'
                 : 'border-emerald-200 bg-[#f4f8f6]'
             }`}
           >
@@ -323,7 +323,7 @@ export default function Layout() {
                     `flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
                         ? isDark
-                          ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30'
+                          ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
                           : 'bg-emerald-600/15 text-[#064e3b] border border-emerald-500/30 font-bold'
                         : isDark
                         ? 'text-slate-300 hover:bg-white/5'
@@ -336,7 +336,7 @@ export default function Layout() {
                     <span>{item.name}</span>
                   </div>
                   {item.isProtected && !user && (
-                    <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400/50' : 'text-emerald-600/50'}`} />
+                    <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400/50' : 'text-emerald-600/50'}`} />
                   )}
                 </NavLink>
               );
@@ -344,7 +344,7 @@ export default function Layout() {
 
             <div
               className={`pt-3 mt-2 border-t space-y-2 ${
-                isDark ? 'border-purple-900/40' : 'border-emerald-200'
+                isDark ? 'border-blue-900/40' : 'border-emerald-200'
               }`}
             >
               <Link
@@ -352,7 +352,7 @@ export default function Layout() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold text-white shadow-md ${
                   isDark
-                    ? 'bg-purple-600 shadow-purple-600/30'
+                    ? 'bg-blue-600 shadow-blue-600/30'
                     : 'bg-emerald-600 shadow-emerald-700/20'
                 }`}
               >
@@ -373,7 +373,7 @@ export default function Layout() {
                       : 'bg-emerald-100 text-[#064e3b] border-emerald-300'
                   }`}
                 >
-                  <User className={`w-3.5 h-3.5 ${isDark ? 'text-purple-400' : 'text-emerald-700'}`} />
+                  <User className={`w-3.5 h-3.5 ${isDark ? 'text-blue-400' : 'text-emerald-700'}`} />
                   <span>Sign In</span>
                 </button>
               )}
@@ -388,7 +388,7 @@ export default function Layout() {
           <div
             className={`p-4 rounded-2xl shadow-2xl border flex items-start gap-3 relative overflow-hidden backdrop-blur-xl transition-all duration-300 ${
               isDark
-                ? 'bg-[#0f0a28]/95 border-amber-500/40 text-white shadow-purple-950/90'
+                ? 'bg-[#0a1122]/95 border-amber-500/40 text-white shadow-blue-950/90'
                 : 'bg-white/95 border-amber-500/40 text-slate-900 shadow-emerald-950/20'
             }`}
             role="alert"
@@ -397,7 +397,7 @@ export default function Layout() {
             <div
               className={`absolute top-0 inset-x-0 h-1 ${
                 isDark
-                  ? 'bg-gradient-to-r from-amber-500 via-purple-500 to-indigo-500'
+                  ? 'bg-gradient-to-r from-amber-500 via-blue-500 to-indigo-500'
                   : 'bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-500'
               }`}
             />
@@ -447,7 +447,7 @@ export default function Layout() {
                   }}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shadow-md transition-all duration-200 active:scale-95 ${
                     isDark
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-900/40'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-900/40'
                       : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-700/20'
                   }`}
                 >
@@ -490,7 +490,7 @@ export default function Layout() {
       <footer
         className={`border-t py-8 text-xs relative z-10 transition-colors duration-300 ${
           isDark
-            ? 'border-purple-900/30 bg-[#000000] text-slate-400'
+            ? 'border-blue-900/30 bg-[#000000] text-slate-400'
             : 'border-emerald-900/10 bg-[#eef4f0] text-emerald-900'
         }`}
       >
@@ -502,10 +502,10 @@ export default function Layout() {
             >
               API Sentinel Engine Online
             </span>
-            <span className={isDark ? 'text-purple-400' : 'text-emerald-600'}>•</span>
+            <span className={isDark ? 'text-blue-400' : 'text-emerald-600'}>•</span>
             <span>Real-time Proxy &amp; Contract Verification</span>
           </div>
-          <div className={isDark ? 'text-purple-300/60' : 'text-emerald-800/80 font-medium'}>
+          <div className={isDark ? 'text-blue-300/60' : 'text-emerald-800/80 font-medium'}>
             Built with React, Vite, Tailwind CSS &amp; Supabase
           </div>
         </div>
