@@ -29,6 +29,13 @@ import {
   CheckSquare,
   Square,
   Lock,
+  Download,
+  Eye,
+  StopCircle,
+  RefreshCw,
+  BarChart2,
+  Flame,
+  X,
 } from 'lucide-react';
 
 // Quick Preset Examples
@@ -258,6 +265,16 @@ export default function TesterPage() {
   const [activeResTab, setActiveResTab] = useState('body'); // 'body' | 'headers' | 'summary'
   const [copied, setCopied] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
+
+  // Load Test State & Configuration
+  const [loadTestConfig, setLoadTestConfig] = useState({
+    targetRps: 25,
+    durationSec: 5,
+  });
+  const [loadTestState, setLoadTestState] = useState(null); // null | { status, totalSent, failed, ... }
+  const [isLoadTesting, setIsLoadTesting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const loadTestAbortRef = useRef(false);
 
   // History Drawer State
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
@@ -673,6 +690,320 @@ export default function TesterPage() {
     }
   };
 
+  // =========================================================================
+  // REAL LOAD TEST RUNNER ENGINE
+  // =========================================================================
+  const handleRunLoadTest = async () => {
+    const finalUrl = buildFinalUrl();
+    if (!finalUrl || bodyJsonError) return;
+
+    const targetRps = Math.max(1, Math.min(100, Number(loadTestConfig.targetRps) || 25));
+    const durationSec = Math.max(1, Math.min(60, Number(loadTestConfig.durationSec) || 5));
+    const totalExpected = targetRps * durationSec;
+
+    loadTestAbortRef.current = false;
+    setIsLoadTesting(true);
+
+    const startTime = Date.now();
+    const finalHeaders = buildFinalHeaders();
+    const isPayloadMethod = ['POST', 'PUT', 'PATCH'].includes(method);
+
+    const initialTestState = {
+      status: 'Running',
+      method,
+      url: finalUrl,
+      targetRps,
+      durationSec,
+      totalExpected,
+      totalSent: 0,
+      failed: 0,
+      successCount: 0,
+      statusCounts: {},
+      latencies: [],
+      rpsHistory: [targetRps],
+      progress: 0,
+      elapsedSec: 0,
+      avgLatency: 0,
+      p50Latency: 0,
+      minLatency: 0,
+      maxLatency: 0,
+      successRate: 100,
+      startedAt: new Date().toISOString(),
+    };
+    setLoadTestState(initialTestState);
+
+    let sent = 0;
+    let failed = 0;
+    let successCount = 0;
+    const latencies = [];
+    const statusCounts = {};
+    const rpsBuckets = [];
+
+    // Helper to calculate percentiles
+    const calcStats = () => {
+      if (latencies.length === 0) {
+        return { avg: 0, p50: 0, min: 0, max: 0 };
+      }
+      const sorted = [...latencies].sort((a, b) => a - b);
+      const sum = sorted.reduce((a, b) => a + b, 0);
+      const avg = Math.round(sum / sorted.length);
+      const p50Index = Math.floor(sorted.length * 0.5);
+      const p50 = sorted[p50Index] || 0;
+      const min = sorted[0];
+      const max = sorted[sorted.length - 1];
+      return { avg, p50, min, max };
+    };
+
+    // Run interval per second for the configured duration
+    for (let sec = 0; sec < durationSec; sec++) {
+      if (loadTestAbortRef.current) break;
+
+      const secStart = Date.now();
+      let requestsInThisSecond = 0;
+
+      // Dispatch targetRps requests in parallel chunks for this second
+      const batchPromises = Array.from({ length: targetRps }).map(async () => {
+        if (loadTestAbortRef.current) return;
+        const reqStart = Date.now();
+        try {
+          const res = await fetch('/api/proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: finalUrl,
+              method,
+              headers: finalHeaders,
+              body: isPayloadMethod ? bodyText : undefined,
+              timeoutMs: 12000,
+            }),
+          });
+          const reqTime = Date.now() - reqStart;
+          const data = await res.json();
+          latencies.push(reqTime);
+          sent++;
+          requestsInThisSecond++;
+
+          if (data.ok && data.status >= 200 && data.status < 400) {
+            successCount++;
+            statusCounts[data.status] = (statusCounts[data.status] || 0) + 1;
+          } else {
+            failed++;
+            const st = data.status || 500;
+            statusCounts[st] = (statusCounts[st] || 0) + 1;
+          }
+        } catch (err) {
+          const reqTime = Date.now() - reqStart;
+          latencies.push(reqTime);
+          sent++;
+          failed++;
+          requestsInThisSecond++;
+          statusCounts[0] = (statusCounts[0] || 0) + 1;
+        }
+      });
+
+      await Promise.all(batchPromises);
+
+      rpsBuckets.push(requestsInThisSecond);
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      const progress = Math.min(100, Math.round(((sec + 1) / durationSec) * 100));
+      const { avg, p50, min, max } = calcStats();
+      const currentRate = sent > 0 ? ((successCount / sent) * 100).toFixed(1) : 100;
+
+      setLoadTestState((prev) => ({
+        ...prev,
+        totalSent: sent,
+        failed,
+        successCount,
+        statusCounts: { ...statusCounts },
+        latencies: [...latencies],
+        rpsHistory: [...rpsBuckets],
+        progress,
+        elapsedSec: Number(elapsed),
+        avgLatency: avg,
+        p50Latency: p50,
+        minLatency: min,
+        maxLatency: max,
+        successRate: Number(currentRate),
+      }));
+
+      // Throttle if batch finished in under 1s
+      const secElapsed = Date.now() - secStart;
+      if (secElapsed < 1000 && sec < durationSec - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 - secElapsed));
+      }
+    }
+
+    const finalTotalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+    const finalStats = calcStats();
+    const finalSuccessRate = sent > 0 ? ((successCount / sent) * 100).toFixed(1) : 100;
+    const finalStateName = loadTestAbortRef.current
+      ? 'Stopped'
+      : failed > 0 && successCount === 0
+      ? 'Failed'
+      : 'Completed';
+
+    const finalResults = {
+      status: finalStateName,
+      method,
+      url: finalUrl,
+      targetRps,
+      durationSec,
+      totalExpected,
+      totalSent: sent,
+      failed,
+      successCount,
+      statusCounts,
+      latencies,
+      rpsHistory: rpsBuckets.length > 0 ? rpsBuckets : [targetRps],
+      progress: 100,
+      elapsedSec: Number(finalTotalTime),
+      avgLatency: finalStats.avg,
+      p50Latency: finalStats.p50,
+      minLatency: finalStats.min,
+      maxLatency: finalStats.max,
+      successRate: Number(finalSuccessRate),
+      completedAt: new Date().toISOString(),
+    };
+
+    setLoadTestState(finalResults);
+    setIsLoadTesting(false);
+  };
+
+  const handleStopLoadTest = () => {
+    loadTestAbortRef.current = true;
+    setIsLoadTesting(false);
+  };
+
+  // Generate and Download PDF Report
+  const handleDownloadPDF = () => {
+    if (!loadTestState) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Pop-up blocked. Please allow pop-ups to download the test report.');
+      return;
+    }
+
+    const {
+      status,
+      method: m,
+      url: u,
+      targetRps,
+      durationSec,
+      totalSent,
+      failed,
+      successCount,
+      avgLatency,
+      p50Latency,
+      minLatency,
+      maxLatency,
+      successRate,
+      elapsedSec,
+      statusCounts,
+    } = loadTestState;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>API Sentinel - Load Test Report</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; color: #064e3b; background: #ffffff; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
+          .badge { background: #064e3b; color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: bold; font-size: 13px; }
+          .url-box { background: #f0fdf4; border: 1px solid #a7f3d0; padding: 12px; border-radius: 8px; font-family: monospace; margin: 20px 0; font-size: 14px; }
+          .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+          .card { background: #f8faf9; border: 1px solid #d1fae5; padding: 15px; border-radius: 10px; }
+          .card-title { font-size: 12px; color: #047857; text-transform: uppercase; font-weight: bold; margin-bottom: 6px; }
+          .card-value { font-size: 24px; font-weight: 800; color: #064e3b; }
+          .status-tag { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #ecfdf5; color: #059669; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th, td { border: 1px solid #d1fae5; padding: 10px; text-align: left; font-size: 13px; }
+          th { background: #ecfdf5; color: #064e3b; }
+          .footer { margin-top: 40px; font-size: 11px; color: #6b7280; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 15px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <h1 style="margin: 0; font-size: 24px; color: #064e3b;">API Sentinel Load Test Report</h1>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #047857;">Automated API Performance &amp; SLA Benchmark</p>
+          </div>
+          <div class="badge">${targetRps} RPS • ${durationSec}s</div>
+        </div>
+
+        <div class="url-box">
+          <strong>[${m}]</strong> ${u}
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+          <span class="status-tag">Status: ${status}</span>
+          <span style="font-size: 13px; color: #047857;">Sent: <strong>${totalSent.toLocaleString()}</strong> | Failed: <strong>${failed.toLocaleString()}</strong> | Success Rate: <strong>${successRate}%</strong></span>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-title">Total Time</div>
+            <div class="card-value">${elapsedSec}s</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Configured RPS</div>
+            <div class="card-value">${targetRps}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total Requests</div>
+            <div class="card-value">${totalSent.toLocaleString()}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Success Rate</div>
+            <div class="card-value">${successRate}%</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Average Latency</div>
+            <div class="card-value">${avgLatency} ms</div>
+          </div>
+          <div class="card">
+            <div class="card-title">p50 Latency</div>
+            <div class="card-value">${p50Latency} ms</div>
+          </div>
+        </div>
+
+        <h3 style="color: #064e3b; margin-top: 30px; font-size: 16px;">Detailed Latency &amp; Status Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Minimum Latency</td><td>${minLatency} ms</td></tr>
+            <tr><td>Maximum Latency</td><td>${maxLatency} ms</td></tr>
+            <tr><td>Successful Responses</td><td>${successCount.toLocaleString()}</td></tr>
+            <tr><td>Failed Requests</td><td>${failed.toLocaleString()}</td></tr>
+            ${Object.entries(statusCounts || {})
+              .map(([code, cnt]) => `<tr><td>HTTP Status ${code === '0' ? 'Network Error' : code}</td><td>${cnt} requests</td></tr>`)
+              .join('')}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          Generated automatically by API Sentinel Live Engine on ${new Date().toLocaleString()}
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   // Save to collections handler
   const handleSaveToCollections = async () => {
     if (!user) {
@@ -803,13 +1134,11 @@ export default function TesterPage() {
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${isDark ? 'border-purple-500/20' : 'border-emerald-200'}`}>
         <div>
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-xl text-white flex items-center justify-center font-mono font-bold text-xs shadow-md ${
-              isDark
-                ? 'bg-purple-600 shadow-purple-600/30'
-                : 'bg-emerald-700 shadow-emerald-700/20'
-            }`}>
-              {'{ }'}
-            </div>
+            <img
+              src="/logo.png"
+              alt="API Sentinel Logo"
+              className="w-8 h-8 rounded-xl object-contain shadow-md bg-black/90 p-0.5 border border-emerald-500/20"
+            />
             <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
               isDark ? 'text-white' : 'text-[#064e3b]'
             }`}>

@@ -178,15 +178,11 @@ export default function AuthModal() {
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div
-            className={`w-10 h-10 rounded-2xl flex items-center justify-center font-mono font-bold text-base shadow-lg text-white ${
-              isDark
-                ? 'bg-gradient-to-br from-purple-600 to-indigo-600 shadow-purple-600/30'
-                : 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-emerald-600/30'
-            }`}
-          >
-            {'{ }'}
-          </div>
+          <img
+            src="/logo.png"
+            alt="API Sentinel Logo"
+            className="w-10 h-10 rounded-2xl object-contain shadow-md bg-black/90 p-0.5 border border-emerald-500/20"
+          />
           <div>
             <h2
               id="auth-modal-title"

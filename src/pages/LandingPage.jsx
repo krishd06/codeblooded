@@ -222,15 +222,11 @@ export default function LandingPage() {
               }`}
             >
               <div className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm ${
-                    isDark
-                      ? 'bg-gradient-to-tr from-blue-600 to-indigo-500'
-                      : 'bg-gradient-to-tr from-emerald-600 to-teal-700'
-                  }`}
-                >
-                  {'{ }'}
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="API Sentinel Logo"
+                  className="w-5 h-5 rounded-full object-contain shadow-sm bg-black/90 p-0.5 border border-emerald-500/20"
+                />
                 <div
                   className={`flex items-center gap-1 font-semibold cursor-pointer ${
                     isDark ? 'text-slate-200 hover:text-white' : 'text-[#064e3b] hover:text-emerald-800'
@@ -646,15 +642,11 @@ export default function LandingPage() {
         <div className="text-center space-y-2.5 max-w-xl mx-auto">
           {/* Header Badge */}
           <div className="inline-flex items-center gap-2 mb-1">
-            <div
-              className={`w-6 h-6 rounded-lg text-white flex items-center justify-center font-mono font-bold text-xs shadow-md ${
-                isDark
-                  ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-600/30'
-                  : 'bg-gradient-to-br from-emerald-600 to-teal-800 shadow-emerald-600/30'
-              }`}
-            >
-              {'{ }'}
-            </div>
+            <img
+              src="/logo.png"
+              alt="API Sentinel Logo"
+              className="w-7 h-7 rounded-lg object-contain shadow-md bg-black/90 p-0.5 border border-emerald-500/20"
+            />
             <span
               className={`font-extrabold text-2xl tracking-tight ${
                 isDark ? 'text-white' : 'text-[#064e3b]'

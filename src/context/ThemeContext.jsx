@@ -6,9 +6,9 @@ export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
     try {
       const savedTheme = localStorage.getItem('api_sentinel_theme');
-      return savedTheme === 'light' ? 'light' : 'dark';
+      return savedTheme === 'dark' ? 'dark' : 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 

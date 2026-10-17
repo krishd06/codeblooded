@@ -78,12 +78,12 @@ export default function Layout() {
           : 'bg-[#f4f8f6] text-[#064e3b] selection:bg-emerald-500 selection:text-white'
       }`}
     >
-      {/* Top Navbar matching active theme */}
+      {/* Top Floating Frozen Navbar matching active theme */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b transition-all duration-300 ${
+        className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300 ${
           isDark
-            ? 'bg-[#000000]/95 border-white/5'
-            : 'bg-[#f4f8f6]/95 border-emerald-900/10 shadow-sm shadow-emerald-950/5'
+            ? 'bg-[#000000]/90 border-white/10 shadow-lg shadow-black/60'
+            : 'bg-[#f4f8f6]/92 border-emerald-900/10 shadow-md shadow-emerald-950/5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,15 +94,11 @@ export default function Layout() {
                 to="/"
                 className="flex items-center gap-3 group transition-all duration-300"
               >
-                <div
-                  className={`w-9 h-9 rounded-xl text-white flex items-center justify-center font-mono font-bold text-sm shadow-lg group-hover:scale-105 transition-all duration-200 ${
-                    isDark
-                      ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-600/30'
-                      : 'bg-gradient-to-br from-emerald-600 to-teal-800 shadow-emerald-600/30'
-                  }`}
-                >
-                  {'{ }'}
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="API Sentinel Logo"
+                  className="w-9 h-9 rounded-xl object-contain shadow-md group-hover:scale-105 transition-all duration-200 bg-black/90 p-0.5 border border-emerald-500/20"
+                />
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span
@@ -483,7 +479,13 @@ export default function Layout() {
 
       {/* Main Page Container */}
       <main className="w-full flex-1 relative z-10">
-        <Outlet />
+        {location.pathname === '/' ? (
+          <Outlet />
+        ) : (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+            <Outlet />
+          </div>
+        )}
       </main>
 
       {/* Footer */}
